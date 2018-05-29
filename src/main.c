@@ -108,8 +108,7 @@ int main(int argc, char const *argv[]) {
 	}
 
 	int fd = open(argv[1], O_RDWR | O_CREAT, 00644);
-	// COMANDO comandos = parse(fd);
-	COMANDO comandos = malloc (sizeof struct comando)
+	COMANDO comandos = parse(fd);
 
 
 	for(COMANDO aux = comandos; aux ; aux = aux->prox )
@@ -144,8 +143,7 @@ int main(int argc, char const *argv[]) {
 	}
 
 
-	
-	LINHA linhas = parse(fd);
+
 
 
 

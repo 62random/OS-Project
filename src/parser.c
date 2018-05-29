@@ -31,6 +31,12 @@ int readln(int fildes, char *buf, int nbyte){
     return num;
 }
 
+/**
+	@brief			Função responsável alocar memória para uma linha de comandos.
+	@param  src 	String inserir no comando.
+	@return 		Número de bytes lidos.
+*/
+
 LCMD criarCMD(char * src){
 	LCMD novo = malloc(sizeof(struct linhacmd));
 	novo->comando = src;
@@ -39,11 +45,23 @@ LCMD criarCMD(char * src){
 	return novo;
 }
 
+/**
+	@brief			Função responsável verificar o tipo de comando inseriro.
+	@param  str 	String a verificar.
+	@return 		Boolean.
+*/
+
 int split_string(char * str){
 	if (strlen(str) >= 2 && str[0] == '$' && str[1] != '|')
 		return 1;
 	return 0;
 }
+
+/**
+	@brief			Função responsável ler de um ficheiro e converter o que foi lido num conjunto de comandos.
+	@param  str 	Escritor do ficheiro.
+	@return 		Conjunto de comandos.
+*/
 
 LCMD parser(int fildes){
 	LCMD start = NULL, percorre, ant = NULL;
@@ -69,6 +87,14 @@ LCMD parser(int fildes){
 	}
 	return start;
 }
+
+/**
+	@brief			Função responsável ler de um ficheiro e converter o que foi lido em conjuntos de comandos.
+	@param  str 	Conjunto de comandos.
+	@param  r 		Número de conjuntos criados.
+	@return 		Array com o conjunto dos comandos do ficheiro.
+*/
+
 
 LCMD * parser_split(LCMD a, int * r){
 	LCMD aux = a,ant = NULL;

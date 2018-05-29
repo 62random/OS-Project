@@ -144,8 +144,8 @@ int main(int argc, char const *argv[]) {
 	}
 
 
-///falta muita merda
-
+	
+	LINHA linhas = parse(fd);
 
 
 

@@ -17,9 +17,9 @@ int main(int argc, char const *argv[]) {
 		exit(-1);
 	}
 
-	int fd = open(argv[1], O_RDWR | O_APPEND | O_CREAT, 00644);
+	int fd = open(argv[1], O_RDWR | O_CREAT, 00644);
 
-	
+
 	LINHA linhas = parse(fd);
 
 

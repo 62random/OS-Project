@@ -63,26 +63,24 @@ void escreve_conta_palavras(const char * line,int *v,int n,char ** args){
 
 int mysystem(const char * command){
 
-   int p;
-
-   p=fork();
+   int p = fork();
 
    if (p == 0) {
-	   int n = conta_palavras(command); // contar palavras
+	   int n = conta_palavras(command); 				//contar palavras
 
-	   int v[n],i; // array com o tam das palavra
-	   for(i=0; i < n; v[i++]=0); // inicializar o array
+	   int v[n],i; 										//array com o tam das palavra
+	   for(i=0; i < n; v[i++]=0); 						//inicializar o array
 
-	   char ** args = malloc((n+1)*sizeof(char*)); // alocar espaço para os argumentos
-	   for(i=0; i <= n; i++){
+	   char ** args = malloc((n+1)*sizeof(char*)); 		//alocar espaço para os argumentos
+	   for(i=0; i <= n; i++)
 		   args[i] = malloc(TAM_STR*sizeof(char));
-	   }
+		   
 	   args[n] = NULL;
 
 
-	   escreve_conta_palavras(command,v,n,args); // preencher os argumentos
+	   escreve_conta_palavras(command,v,n,args); 		//preencher os argumentos
 
-	   execvp(args[0],args); //executar
+	   execvp(args[0],args); 							//executar
 	   perror("erros->bla");
 	   _exit(0);
 
@@ -94,9 +92,8 @@ int mysystem(const char * command){
 int main(int argc, char const *argv[]) {
 
 	int p[2];
-	int i = 0;
+	int i = 0, n;
 	char ** args;
-	int n;
 	char buffer;
 
 	if (argc != 2) {

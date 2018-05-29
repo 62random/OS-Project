@@ -19,8 +19,8 @@ int main(int argc, char const *argv[]) {
 
 	int fd = open(argv[1], O_RDWR | O_APPEND | O_CREAT, 00644);
 
-///falta muita merda
-
+	
+	LINHA linhas = parse(fd);
 
 
 

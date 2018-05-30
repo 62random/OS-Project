@@ -9,6 +9,7 @@
 #include <math.h>
 
 typedef struct linhacmd{
+	char * desc;
 	char * comando;
 	struct linhacmd * prox;
 } * LCMD;

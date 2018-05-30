@@ -18,7 +18,7 @@ int readln(int fildes, char *buf, int nbyte){
 		num += n;
         c = *(buf + num-1);
     }
-	
+
 	for(i = 0 ; i < num; i++)
 		if ((*(buf + i)) == '\n'){
 			*(buf + i) = '\0';
@@ -35,7 +35,7 @@ int readln(int fildes, char *buf, int nbyte){
 */
 LCMD criarCMD(char * src){
 	LCMD novo = malloc(sizeof(struct linhacmd));
-	novo->comando = src;
+	novo->desc = src;
 	novo->prox = NULL;
 
 	return novo;
@@ -49,6 +49,18 @@ LCMD criarCMD(char * src){
 
 int type_string(char * str){
 	if (strlen(str) >= 2 && str[0] == '$' && str[1] != '|')
+		return 1;
+	return 0;
+}
+
+/**
+	@brief			Função responsável verificar se a linha lida é um comando.
+	@param  str 	String a verificar.
+	@return 		Boolean.
+*/
+
+int test_dollar(char * str){
+	if ((str) && str[0] == '$')
 		return 1;
 	return 0;
 }
@@ -70,15 +82,19 @@ LCMD parser(int fildes){
 		str2 = malloc((n+1)*sizeof(char));
 		strcpy(str2,str);
 
-		percorre = criarCMD(str2);
+		if (!test_dollar(str2))
+			percorre = criarCMD(str2);
+		else percorre->comando = str2;
 
-		if (ant == NULL){
-			start = percorre;
-			ant = percorre;
-		}
-		else{
-			ant->prox = percorre;
-			ant = percorre;
+		if (test_dollar(str2)){
+			if (ant == NULL){
+				start = percorre;
+				ant = percorre;
+			}
+			else{
+				ant->prox = percorre;
+				ant = percorre;
+			}
 		}
 	}
 	return start;

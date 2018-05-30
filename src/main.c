@@ -19,8 +19,10 @@ void escreveFicheiroAux(int fp, int fp_aux, LCMD comando){
 
 	char c;
 
-	write(fp,comando->desc,strlen(comando->desc));
-	write(fp,"\n",1);
+	if (comando->desc != NULL){
+		write(fp,comando->desc,strlen(comando->desc));
+		write(fp,"\n",1);
+	}
 	write(fp,comando->comando,strlen(comando->comando));
 	write(fp,"\n",1);
 	write(fp,">>>\n",4);
@@ -125,6 +127,14 @@ int main(int argc, char const *argv[]) {
 	int r = 0,d,fd1,n;
 	LCMD * comandos = parser_split	(aux,  &r);
 	close(fd);
+	for(int i = 0; i < r; i++){
+		aux = comandos[i];
+		while(aux){
+			printf("%s\n",aux->comando);
+			aux = aux ->prox;
+		}
+		printf("next\n");
+	}
 
 	for(d = 0; d < r; d++){
 		if (!fork()){
@@ -164,8 +174,8 @@ int main(int argc, char const *argv[]) {
 
 
 	if (!fork()){
-		//execlp("rm","rm","-r",PATCH_TMP,NULL);
-		//perror("Fallha ao dar delete");
+		execlp("rm","rm","-r",PATCH_TMP,NULL);
+		perror("Fallha ao dar delete");
 		_exit(-1);
 	}
 	return 1;

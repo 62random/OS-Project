@@ -13,8 +13,22 @@
 #define TAM_STR 50
 #define TAM_STR_MAIN 100
 
+pid_t daddy;
+
+void kill_all(int i){
+
+	pid_t self = getpid();
+    if (daddy != self) _exit(0);
+	else{
+		printf("A sair de todos os processos\n" );
+		_exit(0);
+	}
+
+}
 
 int main(int argc, char const *argv[]) {
+	daddy = getpid();
+	signal(SIGINT,kill_all);
 
 	if (argc != 2) {
 		perror("Numero de argumentos inválido");

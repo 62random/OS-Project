@@ -1,5 +1,66 @@
 #include "parser.h"
 
+
+typedef struct string_matrix{
+	int size;
+	int ocupados;
+	char ** matrix;
+} * MSTRING;
+
+/**
+	@brief			Função responsável inicializar um apontador para strings.
+	@param  size 	Tamanho do apontador para strings.
+	@return 		Estrutura com o apontador para strings.
+*/
+
+static MSTRING initMS(int size){
+	MSTRING aux = malloc(sizeof(struct string_matrix));
+	aux->size = size;
+	aux->ocupados = 0;
+	aux->matrix = malloc(size*sizeof(char *));
+
+	return aux;
+}
+
+/**
+	@brief			Função responsável por adicionar um elemento a uma apontador para strings.
+	@param	str 	Adicionar uma apontador para strings.
+	@param  ms 		Estrutura com a apontador para strings.
+*/
+
+static void addMatrix(char * str, MSTRING ms){
+	if (!ms)
+		return;
+
+	char ** aux2;
+
+	if (ms->size == ms->ocupados){
+		aux2 = ms->matrix;
+		ms->size *= 2;
+		ms->matrix = malloc(ms->size*sizeof(char *));
+
+		for(int i = 0; i < ms->ocupados; i++)
+			ms->matrix[i] = aux2[i];
+		free(aux2);
+	}
+
+	ms->matrix[ms->ocupados++] = str;
+}
+
+/**
+	@brief			Função responsável por dar free a uma apontador para strings.
+	@param  ms 		Estrutura com o apontador para strings.
+*/
+
+static void freeMString(MSTRING ms){
+	int i;
+
+	for(i = 0; i < ms->ocupados; i++)
+		free(ms->matrix[i]);
+
+	free(ms);
+}
+
 /**
 	@brief			Função responsável por ler uma linha de um ficheiro.
 	@param  fildes 	Escritor do ficheiro.
@@ -30,12 +91,23 @@ int readln(int fildes, char *buf, int nbyte){
 
 /**
 	@brief			Função responsável alocar memória para uma linha de comandos.
-	@param  src 	String inserir no comando.
+	@param  src1 	String inserir no comando.
+	@param  src2 	String inserir no comando.
 	@return 		Número de bytes lidos.
 */
-LCMD criarCMD(char * src){
+LCMD criarCMD(char * src1 ,char * src2){
+	char * aux;
 	LCMD novo = malloc(sizeof(struct linhacmd));
-	novo->desc = src;
+	if (src1){
+		aux = malloc((strlen(src1)+1)*sizeof(char));
+		strcpy(aux,src1);
+		novo->desc = aux;
+	}
+	if (src1){
+		aux = malloc((strlen(src2)+1)*sizeof(char));
+		strcpy(aux,src2);
+		novo->comando = aux;
+	}
 	novo->prox = NULL;
 
 	return novo;
@@ -71,37 +143,46 @@ int test_dollar(char * str){
 	@return 		Conjunto de comandos.
 */
 
+
 LCMD parser(int fildes){
 	LCMD start = NULL, percorre = NULL, ant = NULL;
-
+	MSTRING matrix = initMS(10);
 	char str[200];
-	char * str2;
+	char * str2= NULL;
 
 	int n;
 	while((n=readln(fildes,str,200)) > 0){
-		str2 = malloc((n+1)*sizeof(char));
+		str2 = malloc((n)*sizeof(char));
 		strcpy(str2,str);
-
-		if (!test_dollar(str2))
-			percorre = criarCMD(str2);
-		else {
-			if (!percorre)
-				percorre = criarCMD(NULL);
-			percorre->comando = str2;
-		}
-
-		if (test_dollar(str2)){
-			if (ant == NULL){
-				start = percorre;
-				ant = percorre;
-			}
-			else{
-				ant->prox = percorre;
-				ant = percorre;
-			}
-			percorre = NULL;
-		}
+		addMatrix(str2,matrix);
 	}
+
+	char * str_ant = NULL;
+	for(n = 0; n < matrix->ocupados; n++){
+		if (test_dollar(matrix->matrix[n])){
+			percorre = criarCMD(str_ant,matrix->matrix[n]);
+			if (start == NULL)
+				start = percorre;
+			else{
+				ant -> prox = percorre;
+			}
+			ant = percorre;
+		}
+		str_ant = matrix->matrix[n];
+	}
+	freeMString(matrix);
+
+	percorre = start;
+
+	while(percorre){
+		if (test_dollar(percorre->desc)){
+			str_ant = percorre->desc;
+			percorre->desc = NULL;
+			free(str_ant);
+		}
+		percorre = percorre -> prox;
+	}
+
 	return start;
 }
 

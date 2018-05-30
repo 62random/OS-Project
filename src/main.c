@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "process.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,7 +29,7 @@ int main(int argc, char const *argv[]) {
 	}
 
 	LCMD aux = parser(fd);
-	int r = 0,d,fd1,n;
+	int r = 0,d,fd1,n,status;
 	LCMD * comandos = parser_split	(aux,  &r);
 	close(fd);
 	int p[2],v[r];
@@ -48,7 +49,7 @@ int main(int argc, char const *argv[]) {
 	}
 
 	for(d = 0; d < r; d++){
-		wait(NULL);
+		wait(&status);
 	}
 
 	fd = open(argv[1], O_WRONLY | O_TRUNC, 00644);

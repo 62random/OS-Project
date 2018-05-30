@@ -83,6 +83,7 @@ void executa(LCMD comando, int aux_2,int fd_origin){
 
 			i = 0;
 			close(p[1]); dup2(p[0],0); close(p[0]);
+
 			wait(&status);
 			if (WIFEXITED(status)){
 				if (WEXITSTATUS(status) == -1)

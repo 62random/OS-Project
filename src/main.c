@@ -64,7 +64,7 @@ void juntaFildes(int d_pai,int d_max_filho,LCMD comando){
 
 void executa(LCMD comando, int aux_2){
 	int p[2];
-	int n, c= 0, fd1;
+	int n, c= 0, fd1, status;
 	char ** args;
 	LCMD aux;
 	char str_aux[1000];
@@ -85,22 +85,26 @@ void executa(LCMD comando, int aux_2){
             _exit(-1);
         }
         else{
-            dup2(p[0],0);
-			close(p[0]);close(p[1]);
+			close(p[1]);
 
 			sprintf(str_aux,"%s/aux_%d_%d",PATCH_TMP,aux_2,c);
 			fd1 = open(str_aux , O_WRONLY | O_TRUNC | O_CREAT , 00644);
 
-			while ( (n = read(0,&buffer,1)) > 0){
+			while ( (n = read(p[0],&buffer,1)) > 0){
     			write(fd1,&buffer,n);
 			}
 
-			close(fd1);
+			close(fd1);close(p[0]);
 			fd1 = open(str_aux , O_RDONLY, 00644);
 
 			c++;
 			dup2(fd1,0);
-			wait(NULL);// preciso testar se dá merda para parar.
+
+			wait(&status);
+			if (WIFEXITED(status)){
+            	if (WEXITSTATUS(status) == -1)
+					_exit(-1);
+			}
         }
 	}
 	juntaFildes(aux_2,c,comando);
@@ -127,14 +131,6 @@ int main(int argc, char const *argv[]) {
 	int r = 0,d,fd1,n;
 	LCMD * comandos = parser_split	(aux,  &r);
 	close(fd);
-	for(int i = 0; i < r; i++){
-		aux = comandos[i];
-		while(aux){
-			printf("%s\n",aux->comando);
-			aux = aux ->prox;
-		}
-		printf("next\n");
-	}
 
 	for(d = 0; d < r; d++){
 		if (!fork()){
@@ -154,7 +150,6 @@ int main(int argc, char const *argv[]) {
 	}
 
 	char str [100],c;
-	printf("1\n");
 
 	for(d = 0; d < r; d++){
 		sprintf(str,"%s/aux_final_%d",PATCH_TMP,d);

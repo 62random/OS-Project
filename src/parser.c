@@ -103,7 +103,7 @@ LCMD criarCMD(char * src1 ,char * src2){
 		strcpy(aux,src1);
 		novo->desc = aux;
 	}
-	if (src1){
+	if (src2){
 		aux = malloc((strlen(src2)+1)*sizeof(char));
 		strcpy(aux,src2);
 		novo->comando = aux;

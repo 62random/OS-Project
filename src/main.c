@@ -14,6 +14,7 @@
 
 
 
+
 void executa(LCMD comando){
 
 	int p[2];
@@ -75,7 +76,6 @@ int main(int argc, char const *argv[]) {
 	for(int d = 0; d < r; d++){
 		wait(NULL);
 	}
-
 
 
 

@@ -30,7 +30,7 @@ int main(int argc, char const *argv[]) {
 
 	LCMD aux = parser(fd);
 	int r = 0,d,fd1,n,status;
-	LCMD * comandos = parser_split	(aux,  &r);
+	LCMD * comandos = parser_split(aux,&r);
 	close(fd);
 	int p[2],v[r];
 
@@ -38,7 +38,7 @@ int main(int argc, char const *argv[]) {
 		pipe(p);
 		if (!fork()){
 			close(p[0]);
-      		executa(comandos[d],d,p[1]);
+      		executa(comandos[d],p[1]);
 			close(p[1]);
 			exit(0);
 		}

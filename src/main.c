@@ -1,4 +1,4 @@
-#include "header.h"
+#include "parser.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,24 +14,17 @@
 
 
 
-typedef struct comando {
-	char * comando;
-	struct comando * prox;
-} * COMANDO;
-
 
 int wordcount(char * str){
 	int status = 0, counter = 0,i;
 
-	for(i=0; str[i] != '\0'; i++){
+	for(i=0; str[i] != '\0'; i++)
 		if (status == 0 && str[i] != ' '){
 			status = 1;
 			counter++;
 		}
-		else if (status == 1 && str[i] == ' '){
+		else if (status == 1 && str[i] == ' ')
 			status = 0;
-		}
-	}
 
 	return counter;
 }
@@ -78,10 +71,10 @@ int main(int argc, char const *argv[]) {
 		exit(-1);
 	}
 
-	int fd = open(argv[1], O_RDWR | O_CREAT, 00644);
+	int fd = open("note", O_RDWR | O_CREAT, 00644);
 
 
-	LINHA linhas = parse(fd);
+	LCMD linhas = parse(fd);
 
 
 

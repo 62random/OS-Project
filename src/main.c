@@ -1,4 +1,7 @@
+<<<<<<< HEAD
+=======
 #include "header.h"
+>>>>>>> b0a1307d454e212bc2368d8d399b1b40c8b56511
 #include "parser.h"
 #include <unistd.h>
 #include <stdio.h>
@@ -15,13 +18,41 @@
 
 
 
-typedef struct comando {
-	char * comando;
-	struct comando * prox;
-} * COMANDO;
+
+<<<<<<< HEAD
+int wordcount(char * str){
+	int status = 0, counter = 0,i;
+
+	for(i=0; str[i] != '\0'; i++)
+		if (status == 0 && str[i] != ' '){
+			status = 1;
+			counter++;
+		}
+		else if (status == 1 && str[i] == ' ')
+			status = 0;
+
+	return counter;
+}
 
 
+int mysystem(const char * command){
+
+   int p = fork();
+
+   if (p == 0) {
+	   int n = conta_palavras(command); 				//contar palavras
+
+	   int v[n],i; 										//array com o tam das palavra
+	   for(i=0; i < n; v[i++]=0); 						//inicializar o array
+
+	   char ** args = malloc((n+1)*sizeof(char*)); 		//alocar espaço para os argumentos
+	   for(i=0; i <= n; i++)
+		   args[i] = malloc(TAM_STR*sizeof(char));
+
+	   args[n] = NULL;
+=======
 void executa(LCMD comando){
+>>>>>>> b0a1307d454e212bc2368d8d399b1b40c8b56511
 
 	int p[2];
 	int i = 0, n;
@@ -67,7 +98,7 @@ int main(int argc, char const *argv[]) {
 		exit(-1);
 	}
 
-	int fd = open(argv[1], O_RDWR | O_CREAT, 00644);
+	int fd = open("note", O_RDWR | O_CREAT, 00644);
 
 	LCMD aux = parser(fd);
 	int r = 0;
@@ -84,6 +115,10 @@ int main(int argc, char const *argv[]) {
 	}
 
 
+<<<<<<< HEAD
+	LCMD linhas = parse(fd);
+=======
+>>>>>>> b0a1307d454e212bc2368d8d399b1b40c8b56511
 
 
 

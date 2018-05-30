@@ -18,11 +18,13 @@ int readln(int fildes, char *buf, int nbyte){
 		num += n;
         c = *(buf + num-1);
     }
+	
 	for(i = 0 ; i < num; i++)
 		if ((*(buf + i)) == '\n'){
 			*(buf + i) = '\0';
 			break;
 		}
+
     return num;
 }
 
@@ -31,7 +33,6 @@ int readln(int fildes, char *buf, int nbyte){
 	@param  src 	String inserir no comando.
 	@return 		Número de bytes lidos.
 */
-
 LCMD criarCMD(char * src){
 	LCMD novo = malloc(sizeof(struct linhacmd));
 	novo->comando = src;

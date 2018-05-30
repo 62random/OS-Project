@@ -20,44 +20,20 @@ typedef struct comando {
 } * COMANDO;
 
 
+int wordcount(char * str){
+	int status = 0, counter = 0,i;
 
+	for(i=0; str[i] != '\0'; i++){
+		if (status == 0 && str[i] != ' '){
+			status = 1;
+			counter++;
+		}
+		else if (status == 1 && str[i] == ' '){
+			status = 0;
+		}
+	}
 
-
-int conta_palavras(const char * line){
-   int i = 0;
-   int palavra = 0,status = 0;
-   for(;line[i] != '\0'; i++){
-	   if (status == 0 && line[i] != ' ') {
-		   palavra++; status = 1;
-	   }
-	   else if (status == 1 && line[i] == ' '){
-		   status=0;
-	   }
-   }
-
-   return palavra;
-}
-
-void escreve_conta_palavras(const char * line,int *v,int n,char ** args){
-   int i = 0;
-   int palavra = 0,status = 0;
-   for(;line[i] != '\0'; i++){
-	   if (status == 0 && line[i] != ' ') {
-		   palavra++;
-		   status = 1;
-		   args[palavra-1][v[palavra-1]] = line[i];
-		   v[palavra-1]++;
-	   }
-	   else if (status == 1 && line[i] == ' '){
-		   status=0;
-	   }
-	   else if (status == 1){
-		   args[palavra-1][v[palavra-1]] = line[i];
-		   v[palavra-1]++;
-	   }
-   }
-   for(i=0; i < palavra; i++)
-	   args[i][v[i]] ='\0';
+	return counter;
 }
 
 
@@ -74,7 +50,7 @@ int mysystem(const char * command){
 	   char ** args = malloc((n+1)*sizeof(char*)); 		//alocar espaço para os argumentos
 	   for(i=0; i <= n; i++)
 		   args[i] = malloc(TAM_STR*sizeof(char));
-		   
+
 	   args[n] = NULL;
 
 
@@ -88,6 +64,7 @@ int mysystem(const char * command){
 
    return 0;
 }
+
 
 int main(int argc, char const *argv[]) {
 

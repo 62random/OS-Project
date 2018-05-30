@@ -143,7 +143,6 @@ int test_dollar(char * str){
 	@return 		Conjunto de comandos.
 */
 
-
 LCMD parser(int fildes){
 	LCMD start = NULL, percorre = NULL, ant = NULL;
 	MSTRING matrix = initMS(10);
@@ -192,7 +191,6 @@ LCMD parser(int fildes){
 	@param  r 		Número de conjuntos criados.
 	@return 		Array com o conjunto dos comandos do ficheiro.
 */
-
 
 LCMD * parser_split(LCMD a, int * r){
 	LCMD aux = a,ant = NULL;
@@ -268,4 +266,19 @@ char ** split_string(char * str){
 	matrix[i] = NULL;
 
 	return matrix;
+}
+
+/**
+	@brief			Função responsável por dar free a um apontador para strings.
+	@param  str 	Apontador para strings
+*/
+
+void freeApChar(char ** str){
+	if (str){
+		int i = 0;
+		while (str[i]) {
+			free(str[i++]);
+		}
+		free(str);
+	}
 }

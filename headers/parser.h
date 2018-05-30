@@ -8,7 +8,11 @@
 #include <string.h>
 #include <math.h>
 
-typedef struct linhacmd * LCMD;
+typedef struct linhacmd{
+	char * comando;
+	struct linhacmd * prox;
+} * LCMD;
+
 
 
 int 	readln			(int fildes, char *buf, int nbyte);

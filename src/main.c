@@ -1,4 +1,5 @@
 #include "header.h"
+#include "parser.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,41 +38,47 @@ int wordcount(char * str){
 }
 
 
-int mysystem(const char * command){
 
-   int p = fork();
-
-   if (p == 0) {
-	   int n = conta_palavras(command); 				//contar palavras
-
-	   int v[n],i; 										//array com o tam das palavra
-	   for(i=0; i < n; v[i++]=0); 						//inicializar o array
-
-	   char ** args = malloc((n+1)*sizeof(char*)); 		//alocar espaço para os argumentos
-	   for(i=0; i <= n; i++)
-		   args[i] = malloc(TAM_STR*sizeof(char));
-
-	   args[n] = NULL;
-
-
-	   escreve_conta_palavras(command,v,n,args); 		//preencher os argumentos
-
-	   execvp(args[0],args); 							//executar
-	   perror("erros->bla");
-	   _exit(0);
-
-   }
-
-   return 0;
-}
-
-
-int main(int argc, char const *argv[]) {
+void executa(LCMD comando){
 
 	int p[2];
 	int i = 0, n;
 	char ** args;
-	char buffer;
+	LCMD aux;
+	int c = 0;
+
+	for(aux = comando; aux; aux = aux->prox )
+		i++;
+
+	for(aux = comando; aux; aux = aux->prox ){
+
+        pipe(p);
+        n = fork();
+        if(n==0){
+            if (c != i-1)
+                dup2(p[1],1);
+            close(p[1]);close(p[0]);
+
+			args = converteComando(aux->comando);
+			execvp(args[0],args);
+				perror("Fail no exec");
+            	_exit(-1);
+        }
+        else{
+            dup2(p[0],0);
+            close(p[0]);close(p[1]);
+			wait(NULL);
+			c++;
+        }
+
+	}
+
+
+
+}
+
+int main(int argc, char const *argv[]) {
+
 
 	if (argc != 2) {
 		perror("Numero de argumentos inválido");
@@ -80,8 +87,21 @@ int main(int argc, char const *argv[]) {
 
 	int fd = open(argv[1], O_RDWR | O_CREAT, 00644);
 
+	LCMD aux = parser(fd);
+	int r = 0;
+	LCMD * comandos;
+	comandos = parser_split	(aux,  &r);
 
-	LINHA linhas = parse(fd);
+	for(int d = 0; d < r; d++){
+		if (!fork())
+      		executa(comandos[d]);
+	}
+
+	for(int d = 0; d < r; d++){
+		wait(NULL);
+	}
+
+
 
 
 

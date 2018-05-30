@@ -118,6 +118,12 @@ LCMD * parser_split(LCMD a, int * r){
 	return final;
 }
 
+/**
+	@brief			Função responsável por contar o número de palavras de uma string.
+	@param  str 	String a percorrer.
+	@return 		Número de palavras.
+*/
+
 int wordcount(char * str){
 	int status = 0, counter = 0,i;
 
@@ -134,6 +140,11 @@ int wordcount(char * str){
 	return counter;
 }
 
+/**
+	@brief			Função responsável por partir uma string num conjunto de strings das suas palavras.
+	@param  str 	String a percorrer.
+	@return 		Array de string com as palavras da string.
+*/
 
 char ** split_string(char * str){
 	char s[2] = " ";

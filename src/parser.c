@@ -72,7 +72,7 @@ int test_dollar(char * str){
 */
 
 LCMD parser(int fildes){
-	LCMD start = NULL, percorre, ant = NULL;
+	LCMD start = NULL, percorre = NULL, ant = NULL;
 
 	char str[200];
 	char * str2;

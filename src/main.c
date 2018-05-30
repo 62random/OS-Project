@@ -15,12 +15,16 @@
 
 
 
-void executa(LCMD comando){
 
+void executa(LCMD comando, int aux_2){
+	int fd1;
 	int p[2];
 	int i = 0, n;
 	char ** args;
 	LCMD aux;
+	char str_aux[1000];
+	char buffer;
+
 	int c = 0;
 
 	for(aux = comando; aux; aux = aux->prox )
@@ -31,9 +35,11 @@ void executa(LCMD comando){
         pipe(p);
         n = fork();
         if(n==0){
-            if (c != i-1)
-                dup2(p[1],1);
+
+			dup2(p[1],1);
             close(p[1]);close(p[0]);
+
+
 
 			args = split_string(aux->comando);
 			execvp(args[1],args + 1);
@@ -42,9 +48,18 @@ void executa(LCMD comando){
         }
         else{
             dup2(p[0],0);
-            close(p[0]);close(p[1]);
-			wait(NULL);
+			close(p[0]);close(p[1]);
+
+			sprintf(str_aux,"aux_%d_%d",aux_2,c);
+			fd1 = open(str_aux , O_WRONLY | O_TRUNC | O_CREAT , 00644);
+			while ( (n = read(0,&buffer,1)) > 0)
+    			write(fd1,&buffer,n);
+			close(fd1);
+			fd1 = open(str_aux , O_RDONLY, 00644);
+
 			c++;
+			dup2(fd1,0);
+			wait(NULL);
         }
 
 	}
@@ -70,7 +85,7 @@ int main(int argc, char const *argv[]) {
 
 	for(int d = 0; d < r; d++){
 		if (!fork()){
-      		executa(comandos[d]);
+      		executa(comandos[d],d);
 			exit(0);
 		}
 	}

@@ -1,7 +1,13 @@
+Isto vai dar sort
 $ ls
+Jk isto e que vai
 $| sort
+Isto faz mais merda
 $| head -1
+Outro comando feio
 $ ls
+Com este cancro
 $| wc
+Agora fode-te
 $ ps
 $ ls

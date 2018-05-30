@@ -45,7 +45,7 @@ void juntaFildes(int d_pai,int d_max_filho,LCMD comando,char ** buffer){
 void executa(LCMD comando,int fd_origin){
 	int p[2];
 	int n,c= 0, status;
-	char ** args;
+	char ** args = NULL;
 	LCMD aux_comando;
 	char * str_aux;
 	int size = 1024;
@@ -61,11 +61,11 @@ void executa(LCMD comando,int fd_origin){
 	for(aux_comando = comando; aux_comando; aux_comando = aux_comando->prox, c++){
 
 		pipe(p);
-		args = split_string(aux_comando->comando);
         n = fork();
         if(n==0){
 			dup2(p[1],1);
             close(p[1]);close(p[0]);
+			args = split_string(aux_comando->comando);
 			execvp(args[1],args + 1);
 			perror("Fail no exec");
             _exit(-1);
@@ -97,9 +97,7 @@ void executa(LCMD comando,int fd_origin){
 
 			i = 0;
 			close(p[1]); dup2(p[0],0); close(p[0]);
-
 			wait(&status);
-			freeApChar(args);
 			if (WIFEXITED(status)){
 				a = WEXITSTATUS(status);
 				if (a == -1)

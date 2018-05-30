@@ -169,6 +169,7 @@ LCMD parser(int fildes){
 		}
 		str_ant = matrix->matrix[n];
 	}
+
 	freeMString(matrix);
 
 	percorre = start;
@@ -276,8 +277,10 @@ char ** split_string(char * str){
 void freeApChar(char ** str){
 	if (str){
 		int i = 0;
+		char * aux;
 		while (str[i]) {
-			free(str[i++]);
+			aux = str[i++];
+			free(aux);
 		}
 		free(str);
 	}

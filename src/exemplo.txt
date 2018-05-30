@@ -10,4 +10,5 @@ Com este cancro
 $| wc
 Agora fode-te
 $ ps
+asd	
 $ ls

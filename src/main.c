@@ -60,7 +60,7 @@ void executa(LCMD comando){
             close(p[1]);close(p[0]);
 
 			args = converteComando(aux->comando);
-			execvp(args[0],args);
+			execvp(args[0],args + 1);
 				perror("Fail no exec");
             	_exit(-1);
         }

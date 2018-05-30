@@ -159,10 +159,8 @@ char ** split_string(char * str){
 	int i = 0;
 
 	while(token != NULL){
-		if (i != 0)
-			matrix[i-1] = token;
+		matrix[i++] = token;
 		token = strtok(NULL, s);
-		i++;
 	}
 	matrix[i] = NULL;
 

@@ -70,7 +70,7 @@ int test_dollar(char * str){
 	@param  str 	Escritor do ficheiro.
 	@return 		Conjunto de comandos.
 */
-
+/*
 LCMD parser(int fildes){
 	LCMD start = NULL, percorre = NULL, ant = NULL;
 
@@ -95,6 +95,40 @@ LCMD parser(int fildes){
 				ant->prox = percorre;
 				ant = percorre;
 			}
+		}
+	}
+	return start;
+}*/
+
+LCMD parser(int fildes){
+	LCMD start = NULL, percorre = NULL, ant = NULL;
+
+	char str[200];
+	char * str2;
+
+	int n;
+	while((n=readln(fildes,str,200)) > 0){
+		str2 = malloc((n+1)*sizeof(char));
+		strcpy(str2,str);
+
+		if (!test_dollar(str2))
+			percorre = criarCMD(str2);
+		else {
+			if (!percorre)
+				percorre = criarCMD(NULL);
+			percorre->comando = str2;
+		}
+
+		if (test_dollar(str2)){
+			if (ant == NULL){
+				start = percorre;
+				ant = percorre;
+			}
+			else{
+				ant->prox = percorre;
+				ant = percorre;
+			}
+			percorre = NULL;
 		}
 	}
 	return start;

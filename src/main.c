@@ -41,7 +41,7 @@ void executa(LCMD comando){
                 dup2(p[1],1);
             close(p[1]);close(p[0]);
 
-			args = converteComando(aux->comando);
+			args = split_string(aux->comando);
 			execvp(args[0],args + 1);
 				perror("Fail no exec");
             	_exit(-1);

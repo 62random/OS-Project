@@ -1,10 +1,5 @@
 #include "parser.h"
 
-typedef struct linhacmd{
-	char * comando;
-	struct linhacmd * prox;
-} * LCMD;
-
 /**
 	@brief			Função responsável por ler uma linha de um ficheiro.
 	@param  fildes 	Escritor do ficheiro.

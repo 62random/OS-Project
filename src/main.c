@@ -69,8 +69,10 @@ int main(int argc, char const *argv[]) {
 	comandos = parser_split	(aux,  &r);
 
 	for(int d = 0; d < r; d++){
-		if (!fork())
+		if (!fork()){
       		executa(comandos[d]);
+			exit(0);
+		}
 	}
 
 	for(int d = 0; d < r; d++){

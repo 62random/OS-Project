@@ -1,3 +1,7 @@
 $ ls
 $| sort
 $| head -1
+$ ls
+$ | wc
+$ ps
+$ ls

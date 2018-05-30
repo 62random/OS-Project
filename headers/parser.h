@@ -17,8 +17,9 @@ typedef struct linhacmd{
 
 int 	readln			(int fildes, char *buf, int nbyte);
 LCMD 	criarCMD		(char * src);
-int 	split_string	(char * str);
+int 	type_string		(char * str);
 LCMD 	parser			(int fildes);
 LCMD * 	parser_split	(LCMD a, int * r);
+char ** split_string	(char * str);
 
 #endif

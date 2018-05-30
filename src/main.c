@@ -21,24 +21,6 @@ typedef struct comando {
 } * COMANDO;
 
 
-int wordcount(char * str){
-	int status = 0, counter = 0,i;
-
-	for(i=0; str[i] != '\0'; i++){
-		if (status == 0 && str[i] != ' '){
-			status = 1;
-			counter++;
-		}
-		else if (status == 1 && str[i] == ' '){
-			status = 0;
-		}
-	}
-
-	return counter;
-}
-
-
-
 void executa(LCMD comando){
 
 	int p[2];

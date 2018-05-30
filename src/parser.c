@@ -51,7 +51,7 @@ LCMD criarCMD(char * src){
 	@return 		Boolean.
 */
 
-int split_string(char * str){
+int type_string(char * str){
 	if (strlen(str) >= 2 && str[0] == '$' && str[1] != '|')
 		return 1;
 	return 0;
@@ -100,7 +100,7 @@ LCMD * parser_split(LCMD a, int * r){
 	LCMD aux = a,ant = NULL;
 	int counter = 0;
 	while (aux) {
-		if(split_string(aux->comando))
+		if(type_string(aux->comando))
 			counter++;
 		aux = aux->prox;
 	}
@@ -109,7 +109,7 @@ LCMD * parser_split(LCMD a, int * r){
 	counter = 0;
 
 	while(a){
-		if (split_string(a->comando)){
+		if (type_string(a->comando)){
 			if (ant){
 				ant->prox = NULL;
 			}
@@ -121,4 +121,44 @@ LCMD * parser_split(LCMD a, int * r){
 	*r = counter;
 
 	return final;
+}
+
+int wordcount(char * str){
+	int status = 0, counter = 0,i;
+
+	for(i=0; str[i] != '\0'; i++){
+		if (status == 0 && str[i] != ' '){
+			status = 1;
+			counter++;
+		}
+		else if (status == 1 && str[i] == ' '){
+			status = 0;
+		}
+	}
+
+	return counter;
+}
+
+
+char ** split_string(char * str){
+	char s[2] = " ";
+	char * token;
+
+	int size = wordcount(str);
+
+	char ** matrix = malloc((size)*sizeof(char *));
+
+	token = strtok(str, s);
+
+	int i = 0;
+
+	while(token != NULL){
+		if (i != 0)
+			matrix[i-1] = token;
+		token = strtok(NULL, s);
+		i++;
+	}
+	matrix[i] = NULL;
+
+	return matrix;
 }

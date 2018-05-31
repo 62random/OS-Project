@@ -14,6 +14,52 @@
 #define TAM_STR_MAIN 100
 
 pid_t daddy;
+char * buffer_safe_mode;
+int size;
+int k;
+char const * filesource;
+
+void backup_read(char const * source){
+
+	int fd = open(source, O_RDONLY , 00644);
+
+	if (fd == -1){
+		perror("Não conseguiu abrir a porta do ficheiro.");
+		_exit(-1);
+	}
+
+	buffer_safe_mode = malloc(100*sizeof(char));
+	size = 100;
+
+	char c, * aux;
+	int i = 0,n;
+
+	while((n = read(fd,&c,1)) > 0){
+		buffer_safe_mode[i++] = c;
+		if (i == size){
+			aux = buffer_safe_mode;
+			buffer_safe_mode = malloc(2*size*sizeof(char));
+			for(n = 0; n < i ; n++)
+				buffer_safe_mode[n] = aux[n];
+			free(aux);
+			size *= 2;
+		}
+	}
+	k = i;
+	close(fd);
+}
+
+void backup_write(){
+	int fd = open(filesource, O_WRONLY | O_TRUNC , 00644);
+
+	if (fd == -1){
+		perror("Não conseguiu abrir a porta do ficheiro.");
+		_exit(-1);
+	}
+
+	write(fd,buffer_safe_mode,k);
+	close(fd);
+}
 
 void kill_all(int i){
 
@@ -21,6 +67,7 @@ void kill_all(int i){
     if (daddy != self) _exit(-1);
 	else{
 		printf("A sair de todos os processos\n" );
+		backup_write();
 		_exit(0);
 	}
 
@@ -34,8 +81,10 @@ int main(int argc, char const *argv[]) {
 		perror("Numero de argumentos inválido");
 		exit(-1);
 	}
+	filesource = argv[1];
+	backup_read(argv[1]);
 
-	int fd = open(argv[1], O_RDWR | O_CREAT, 00644);
+	int fd = open(argv[1], O_RDONLY , 00644);
 
 	if (fd == -1){
 		perror("Não conseguiu abrir a porta do ficheiro.");

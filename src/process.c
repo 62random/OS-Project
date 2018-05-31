@@ -42,7 +42,7 @@ void juntaFildes(int d_pai,int d_max_filho,LCMD comando,char ** buffer){
 	@param	fd_origin 	Porta do pipe onde se vai guardar o resultado.
 */
 
-void executa(LCMD comando,int fd_origin){
+int executa(LCMD comando,int fd_origin){
 	int p[2];
 	int n,c= 0, status;
 	char ** args = NULL;
@@ -51,7 +51,8 @@ void executa(LCMD comando,int fd_origin){
 	int size = 1024;
 	char * buffer = malloc(size*sizeof(char));
 	char x;
-	int i = 0,k = 0,a;
+	int i = 0,k = 0;
+	pid_t a;
 
 	for(aux_comando = comando; aux_comando; aux_comando = aux_comando->prox)
 		k++;
@@ -100,10 +101,12 @@ void executa(LCMD comando,int fd_origin){
 			wait(&status);
 			if (WIFEXITED(status)){
 				a = WEXITSTATUS(status);
-				if (a == -1)
+				if (a == 255)
 					_exit(-1);
         	}
 		}
 	}
 	juntaFildes(fd_origin,c,comando,buffer_2);
+
+	_exit(0);
 }

@@ -18,7 +18,7 @@ pid_t daddy;
 void kill_all(int i){
 
 	pid_t self = getpid();
-    if (daddy != self) _exit(0);
+    if (daddy != self) _exit(-1);
 	else{
 		printf("A sair de todos os processos\n" );
 		_exit(0);
@@ -46,7 +46,8 @@ int main(int argc, char const *argv[]) {
 	int r = 0,d,fd1,n,status;
 	LCMD * comandos = parser_split(aux,&r);
 	close(fd);
-	int p[2],v[r],a;
+	int p[2],v[r];
+	pid_t a;
 
 	for(d = 0; d < r; d++){
 		pipe(p);
@@ -54,7 +55,7 @@ int main(int argc, char const *argv[]) {
 			close(p[0]);
       		executa(comandos[d],p[1]);
 			close(p[1]);
-			exit(0);
+			_exit(0);
 		}
 		else{
 			v[d] = p[0];
@@ -66,7 +67,7 @@ int main(int argc, char const *argv[]) {
 		wait(&status);
 		if (WIFEXITED(status)){
 			a = WEXITSTATUS(status);
-			if (a == -1){
+			if (a == 255){
 				perror("Um do comandos não conseguiu ser executado.");
 				_exit(-1);
 			}

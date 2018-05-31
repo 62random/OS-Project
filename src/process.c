@@ -110,3 +110,65 @@ int executa(LCMD comando,int fd_origin){
 
 	_exit(0);
 }
+
+/**
+	@brief			Função responsável por atribuir um tipo a uma string.
+	@param source	String a avaliar.
+	@return			Tipo da string.
+*/
+
+int type(char * source){
+	if (source && strlen(source) > 3){
+		if (source[1] == 'n')
+			return 1;
+		if (source[1] == ' ')
+			return 2;
+	}
+	return 0;
+}
+
+/**
+	@brief			Função responsável por calcular o comprimento de uma lista
+	@param 		a	Lista a percorrer.
+	@return			Tamanho do lista.
+*/
+
+int length(LCMD a){
+	int r = 0;
+	while (a) {
+		r++;
+		a = a->prox;
+	}
+
+	return r;
+}
+
+/**
+	@brief				Função responsável por calcular em todos os comandos os indices em está o n-ésimo elemento.
+	@param 		l		Array com as listas dos comandos.
+	@param		pos 	Posição do array em que se começa a ler.
+	@param		n		Número de elementos.
+	@param		ele 	Local para retornar o indices das colunas
+	@return				Indice no array em que está o elemento.
+*/
+
+int posicaoArray(LCMD * l, int pos, int n,	int * ele){
+
+	int i,flag = 0,tam;
+	int i_array = -1, i_col = -1;
+
+	for(i=pos-1; i >= 0 && (!flag) ; i--){
+		tam = length(l[i]);
+		if ((n - tam) > 0){
+			n -= tam;
+		}
+		else{
+			flag = 1;
+			i_array = i;
+			i_col = tam - n;
+		}
+	}
+	*ele = i_col;
+
+	return i_array;
+}

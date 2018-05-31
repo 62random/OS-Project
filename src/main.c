@@ -19,6 +19,11 @@ int size;
 int k;
 char const * filesource;
 
+/**
+	@brief			Função responsável por criar um backup do ficheiro inicial.
+	@param  source 	Path para o file
+*/
+
 void backup_read(char const * source){
 
 	int fd = open(source, O_RDONLY , 00644);
@@ -49,6 +54,10 @@ void backup_read(char const * source){
 	close(fd);
 }
 
+/**
+	@brief			Função responsável escrever o backup no ficheiro.
+*/
+
 void backup_write(){
 	int fd = open(filesource, O_WRONLY | O_TRUNC , 00644);
 
@@ -60,6 +69,11 @@ void backup_write(){
 	write(fd,buffer_safe_mode,k);
 	close(fd);
 }
+
+/**
+	@brief			Função responsável matar todos os processos menos o pai.
+	@param  i 		Tipo de sinal.
+*/
 
 void kill_all(int i){
 

@@ -172,3 +172,27 @@ int posicaoArray(LCMD * l, int pos, int n,	int * ele){
 
 	return i_array;
 }
+
+/**
+	@brief				Função responsável por calcular o número que está no input.
+	@param 	source		String com o comando.
+	@return				Número a ser lido.
+*/
+
+int n_comando(char * source){
+	char * buffer = NULL;
+	int i=1;
+	int r= -1;
+
+	if (type(source) == 1){
+		buffer = malloc(100*sizeof(char));
+		while(source[i] != '|'){
+			buffer[i-1] = source[i];
+			i++;
+		}
+		buffer[i]='\0';
+		r = atoi(buffer);
+	}
+
+	return r;
+}

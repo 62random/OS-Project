@@ -314,6 +314,7 @@ char * outputFromFile(int dependencia,int coluna){
 		_exit(-1);
 	}
 	result = parseFileToString(coluna,fd);
+	close(fd);
 
 	return result;
 }

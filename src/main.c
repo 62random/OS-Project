@@ -19,6 +19,12 @@ int size;
 int k;
 char const * filesource;
 
+void removeFiles(){
+	if(!fork()){
+		execlp("rm","rm","-r",LOCAL,NULL);
+	}
+}
+
 /**
 	@brief			Função responsável por criar um backup do ficheiro inicial.
 	@param  source 	Path para o file
@@ -84,6 +90,7 @@ void kill_all(int i){
 		if(!fork()){
 			execlp("rm","rm","-r",LOCAL,NULL);
 		}
+		wait(NULL);
 		backup_write();
 		_exit(0);
 	}
@@ -130,6 +137,7 @@ int main(int argc, char const *argv[]) {
 			a = WEXITSTATUS(status);
 			if (a == 255){
 				perror("Um do comandos não conseguiu ser executado.");
+				removeFiles();
 				_exit(-1);
 			}
 		}
@@ -138,6 +146,7 @@ int main(int argc, char const *argv[]) {
 	fd = open(argv[1], O_WRONLY | O_TRUNC, 00644);
 	if (fd == -1){
 		perror("Não conseguiu abrir a porta do ficheiro.");
+		removeFiles();
 		_exit(-1);
 	}
 
@@ -151,6 +160,7 @@ int main(int argc, char const *argv[]) {
 
 		if (fd1 == -1){
 			perror("Não conseguiu abrir a porta do ficheiro.");
+			removeFiles();
 			_exit(-1);
 		}
 
@@ -160,9 +170,7 @@ int main(int argc, char const *argv[]) {
 		close(fd1);
 	}
 
-	if(!fork()){
-		execlp("rm","rm","-r",LOCAL,NULL);
-	}
+	removeFiles();
 
 	return 1;
 }

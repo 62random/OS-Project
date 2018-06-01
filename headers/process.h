@@ -10,6 +10,8 @@
 #include <sys/wait.h>
 #include <stdio.h>
 
+#define LOCAL "/tmp/filesaux"
+
 void escreveFicheiroAux		(int fp, char * str , LCMD comando);
 void juntaFildes			(int d_pai,int d_max_filho,LCMD comando,char ** buffer);
 void printmatrix			(char ** matrix);

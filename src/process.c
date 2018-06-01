@@ -22,7 +22,7 @@ void escreveFicheiroAux(int fp, char * str , LCMD comando){
 
 /**
 	@brief					Função responsável por adicionar o resultado de vários comandos ligados a um pipe.
-	@param  d_pai 			Porta para o ficheiro.
+	@param  d_pai 			Número da execução.
 	@param  d_max_filho		Número de comandos interligados.
 	@param	comando 		Struct com a informação sobre o comando executado e a sua descrição.
 	@param 	buffer			Apontador de strings com os vários resultados dos comandos.
@@ -30,16 +30,25 @@ void escreveFicheiroAux(int fp, char * str , LCMD comando){
 
 void juntaFildes(int d_pai,int d_max_filho,LCMD comando,char ** buffer){
 	int i;
+	char str [100];
+	sprintf(str,"%s/aux_%d",LOCAL,d_pai);
+
+	int fd = open(str,O_CREAT | O_WRONLY,0644);
+
+	if (fd == -1){
+		perror("Não conseguiu abrir a porta do ficheiro.");
+		_exit(-1);
+	}
 
 	for(i = 0; i < d_max_filho; i++, comando = comando->prox){
-		escreveFicheiroAux(d_pai,buffer[i],comando);
+		escreveFicheiroAux(fd,buffer[i],comando);
 	}
 }
 
 /**
 	@brief				Função responsável por executar um conjunto de comandos interligados.
 	@param  comando 	Lista de comandos a executar.
-	@param	fd_origin 	Porta do pipe onde se vai guardar o resultado.
+	@param	fd_origin 	Número da execução.
 */
 
 int executa(LCMD comando,int fd_origin){
@@ -89,6 +98,7 @@ int executa(LCMD comando,int fd_origin){
 				}
 			}
 			pipe(p);
+
 			buffer[i] = '\0';
 			write(p[1],buffer,i);
 

@@ -81,6 +81,9 @@ void kill_all(int i){
     if (daddy != self) _exit(-1);
 	else{
 		printf("A sair de todos os processos\n" );
+		if(!fork()){
+			execlp("rm","rm","-r",LOCAL,NULL);
+		}
 		backup_write();
 		_exit(0);
 	}
@@ -95,6 +98,9 @@ int main(int argc, char const *argv[]) {
 		perror("Numero de argumentos inválido");
 		exit(-1);
 	}
+
+	mkdir(LOCAL,0777);
+
 	filesource = argv[1];
 	backup_read(argv[1]);
 
@@ -109,20 +115,12 @@ int main(int argc, char const *argv[]) {
 	int r = 0,d,fd1,n,status;
 	LCMD * comandos = parser_split(aux,&r);
 	close(fd);
-	int p[2],v[r];
 	pid_t a;
 
 	for(d = 0; d < r; d++){
-		pipe(p);
 		if (!fork()){
-			close(p[0]);
-      		executa(comandos[d],p[1]);
-			close(p[1]);
+      		executa(comandos[d],d);
 			_exit(0);
-		}
-		else{
-			v[d] = p[0];
-			close(p[1]);
 		}
 	}
 
@@ -144,9 +142,17 @@ int main(int argc, char const *argv[]) {
 	}
 
 	char c;
+	char str [100];
 
 	for(d = 0; d < r; d++){
-		fd1 = v[d];
+		sprintf(str,"%s/aux_%d",LOCAL,d);
+
+		fd1 = open(str,O_RDONLY,0644);
+
+		if (fd1 == -1){
+			perror("Não conseguiu abrir a porta do ficheiro.");
+			_exit(-1);
+		}
 
 		while ((n = read(fd1,&c,1)) > 0){
 			write(fd,&c,n);
@@ -154,6 +160,9 @@ int main(int argc, char const *argv[]) {
 		close(fd1);
 	}
 
+	if(!fork()){
+		execlp("rm","rm","-r",LOCAL,NULL);
+	}
 
 	return 1;
 }

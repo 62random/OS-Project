@@ -123,14 +123,21 @@ int main(int argc, char const *argv[]) {
 	LCMD * comandos = parser_split(aux,&r);
 	close(fd);
 	pid_t a;
+	int linha,coluna,n_com;
 
 	for(d = 0; d < r; d++){
+		if (type(comandos[d]->comando) == 1){
+			n_com = n_comando(comandos[d]->comando);
+			linha = posicaoArray(comandos,d,n_com,&coluna);
+			printf("n:%d -> linha:%d -> coluna:%d\n",n_com,linha,coluna);
+		}
+		/*
 		if (!fork()){
       		executa(comandos[d],d);
 			_exit(0);
-		}
+		}*/
 	}
-
+	/*
 	for(d = 0; d < r; d++){
 		wait(&status);
 		if (WIFEXITED(status)){
@@ -170,7 +177,7 @@ int main(int argc, char const *argv[]) {
 		close(fd1);
 	}
 
-	removeFiles();
+	removeFiles();*/
 
 	return 1;
 }

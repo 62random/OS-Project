@@ -175,7 +175,7 @@ LCMD parser(int fildes){
 	freeMString(matrix);
 
 	percorre = start;
-	
+
 	while(percorre){
 		if (test_dollar(percorre->desc)){
 			str_ant = percorre->desc;
@@ -286,4 +286,20 @@ void freeApChar(char ** str){
 		}
 		free(str);
 	}
+}
+
+char * parseFileToString(int coluna,int fd){
+	MSTRING matrix = initMS(10);
+	char str[4096];
+	char * str2= NULL;
+
+	int n;
+	while((n=readln(fd,str,200)) > 0){
+		str2 = malloc((n)*sizeof(char));
+		strcpy(str2,str);
+		addMatrix(str2,matrix);
+	}
+
+	return NULL;
+
 }

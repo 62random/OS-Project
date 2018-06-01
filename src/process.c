@@ -129,7 +129,7 @@ int executa(LCMD comando,int fd_origin){
 
 int type(char * source){
 	if (source && strlen(source) > 3){
-		if (source[1] == 'n')
+		if (source[1] != ' ' && source[1] != '|')
 			return 1;
 		if (source[1] == ' ')
 			return 2;

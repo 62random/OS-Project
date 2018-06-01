@@ -227,3 +227,18 @@ int calculaDependencias(LCMD * comandos, int * v,int r){
 
 	return status;
 }
+
+char * outputFromFile(int dependencia,int coluna){
+	char path[100];
+	char * result = NULL;
+	sprintf(path,"%s/aux_%d",LOCAL,dependencia);
+
+	int fd = open(path,O_RDONLY,0644);
+	if (fd == -1){
+		perror("Não conseguiu abrir a porta do ficheiro.");
+		_exit(-1);
+	}
+	result = parseFileToString(coluna,fd);
+
+	return result;
+}

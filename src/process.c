@@ -16,7 +16,7 @@ void escreveFicheiroAux(int fp, char * str , LCMD comando){
 	write(fp,comando->comando,strlen(comando->comando));
 	write(fp,"\n",1);
 	write(fp,">>>\n",4);
-	write(fp,str,strlen(str)+1);
+	write(fp,str,strlen(str));
 	write(fp,"<<<\n",4);
 }
 

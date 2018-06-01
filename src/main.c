@@ -125,7 +125,10 @@ int main(int argc, char const *argv[]) {
 	pid_t a;
 	int linha,coluna,n_com;
 
+	fd = open(argv[1], O_RDONLY , 00644);
+
 	for(d = 0; d < r; d++){
+		char *blasd = parseFileToString(2,fd);
 		if (type(comandos[d]->comando) == 1){
 			n_com = n_comando(comandos[d]->comando);
 			linha = posicaoArray(comandos,d,n_com,&coluna);

@@ -16,14 +16,15 @@ typedef struct linhacmd{
 
 
 
-int 	readln			(int fildes, char *buf, int nbyte);
-LCMD 	criarCMD		(char * src1,char * src2);
-int 	type_string		(char * str);
-LCMD 	parser			(int fildes);
-LCMD * 	parser_split	(LCMD a, int * r);
-char ** split_string	(char * str);
-int 	wordcount		(char * str);
-void 	freeApChar		(char ** str);
+int 	readln				(int fildes, char *buf, int nbyte);
+LCMD 	criarCMD			(char * src1,char * src2);
+int 	type_string			(char * str);
+LCMD 	parser				(int fildes);
+LCMD * 	parser_split		(LCMD a, int * r);
+char ** split_string		(char * str);
+int 	wordcount			(char * str);
+void 	freeApChar			(char ** str);
+char * 	parseFileToString	(int coluna,int fd);
 
 
 #endif

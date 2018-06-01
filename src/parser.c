@@ -67,7 +67,7 @@ static void freeMString(MSTRING ms){
 	@param  buf	   	Apontador para onde vai ser lido.
 	@param  nbyte	Número de elementos máximos do array.
 */
-
+/*
 int readln(int fildes, char *buf, int nbyte){
     int num = 0,n,i;
     char c = *buf;
@@ -85,6 +85,36 @@ int readln(int fildes, char *buf, int nbyte){
 			*(buf + i) = '\0';
 			break;
 		}
+
+    return num;
+}*/
+
+int readln(int fildes, char *buf, int nbyte){
+    int num = 0,n,i;
+    char c ;
+	int flag = 0;
+
+    while( (!flag) && num < nbyte){
+        n = read(fildes,&c,1);
+		if (n == 0)
+			break;
+		if (c == '\n'){
+			flag = 1;
+		}
+		else{
+			buf[num++] = c;
+		}
+    }
+	if (num < nbyte && num != 0){
+		buf[num++] = '\0';
+	}
+
+	/*
+	for(i = 0 ; i < num; i++)
+		if ((*(buf + i)) == '\n'){
+			*(buf + i) = '\0';
+			break;
+		}*/
 
     return num;
 }
@@ -288,6 +318,34 @@ void freeApChar(char ** str){
 	}
 }
 
+char * mystrcat(char * str1, char * str2, int * size,int * i){
+	int size1 = *size;
+	int i1 = * i, flag = 0;
+	int size2 = strlen(str2);
+	char * aux;
+
+	while((size1-i1) <= size2){
+		size1 *= 2;
+		flag = 1;
+	}
+	if(flag){
+		aux = str1;
+		str1 = malloc(size1*sizeof(char));
+		strcpy(str1,aux);
+		free(aux);
+	}
+	strcat(str1,str2);
+	i1 += size2;
+
+	strcat(str1,"\n");
+	i1++;
+
+	*size = size1;
+	*i = i1;
+
+	return str1;
+}
+
 char * parseFileToString(int coluna,int fd){
 	MSTRING matrix = initMS(10);
 	char str[4096];
@@ -299,7 +357,21 @@ char * parseFileToString(int coluna,int fd){
 		strcpy(str2,str);
 		addMatrix(str2,matrix);
 	}
+	int counter = -1; n = 0;
+	while(coluna != counter){
+		if(strcmp(matrix->matrix[n],">>>") == 0){
+			counter++;
+		}
+		n++;
+	}
+	str2 = malloc(100*sizeof(char));
+	int size = 100, i = 0;
 
-	return NULL;
+	while(n < matrix->ocupados && strcmp(matrix->matrix[n],"<<<") != 0){
+		str2 = mystrcat(str2,matrix->matrix[n],&size,&i);
+		n++;
+	}
+	freeMString(matrix);
 
+	return str2;
 }

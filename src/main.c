@@ -106,8 +106,6 @@ int main(int argc, char const *argv[]) {
 		exit(-1);
 	}
 
-	mkdir(LOCAL,0777);
-
 	filesource = argv[1];
 	backup_read(argv[1]);
 
@@ -123,30 +121,36 @@ int main(int argc, char const *argv[]) {
 	LCMD * comandos = parser_split(aux,&r);
 	close(fd);
 	pid_t a;
-	int linha,coluna,n_com;
+	int linha,coluna,n_com, v[r];
 
-	fd = open(argv[1], O_RDONLY , 00644);
+	if(!calculaDependencias(comandos,v,r)){
+		perror("Um dos comandos do tipo $n| não pode ser executado.");
+		_exit(-1);
+	}
+	mkdir(LOCAL,0777);
+
+	//fd = open(argv[1], O_RDONLY , 00644);
 
 	for(d = 0; d < r; d++){
+		/*
 		char *blasd = parseFileToString(2,fd);
 		if (type(comandos[d]->comando) == 1){
 			n_com = n_comando(comandos[d]->comando);
 			linha = posicaoArray(comandos,d,n_com,&coluna);
 			printf("n:%d -> linha:%d -> coluna:%d\n",n_com,linha,coluna);
-		}
-		/*
-		if (!fork()){
+		}*/
+
+		if(!fork()){
       		executa(comandos[d],d);
 			_exit(0);
-		}*/
+		}
 	}
-	/*
+
 	for(d = 0; d < r; d++){
 		wait(&status);
 		if (WIFEXITED(status)){
 			a = WEXITSTATUS(status);
 			if (a == 255){
-				perror("Um do comandos não conseguiu ser executado.");
 				removeFiles();
 				_exit(-1);
 			}
@@ -180,7 +184,7 @@ int main(int argc, char const *argv[]) {
 		close(fd1);
 	}
 
-	removeFiles();*/
+	removeFiles();
 
 	return 1;
 }

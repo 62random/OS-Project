@@ -206,3 +206,24 @@ int n_comando(char * source){
 
 	return r;
 }
+
+int calculaDependencias(LCMD * comandos, int * v,int r){
+	LCMD aux;
+	int status = 1;
+	int linha,coluna,n,i;
+	for(i=0; i < r; i++){
+		aux = comandos[i];
+		if (type(aux->comando) == 1){
+			n = n_comando(aux->comando);
+			linha = posicaoArray(comandos,i,n,&coluna);
+			if (linha == -1 || coluna == -1){
+				v[i] = -2;
+				status = 0;
+			}
+			else v[i] = linha;
+		}
+		else v[i] = -1;
+	}
+
+	return status;
+}

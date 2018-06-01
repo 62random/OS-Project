@@ -20,5 +20,6 @@ int  type					(char * source);
 int  length					(LCMD a);
 int  posicaoArray			(LCMD * l, int pos, int n,	int * ele);
 int  n_comando				(char * source);
+int  calculaDependencias	(LCMD * comandos, int * v,int r);
 
 #endif

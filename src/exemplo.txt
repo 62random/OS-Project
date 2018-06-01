@@ -3,12 +3,4 @@ $ ls
 Jk isto e que vai
 $| sort
 Isto faz mais merda
-$| asdas -1
-Depois
-$  ps
-Tses
-$| wc
-Dibs
-$  ps
-asda
-$  ls -l -a
+$1| head -1

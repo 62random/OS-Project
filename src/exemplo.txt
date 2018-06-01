@@ -4,3 +4,7 @@ Jk isto e que vai
 $| sort
 Isto faz mais merda
 $| head -1
+asda
+$3
+adas
+$| head -1

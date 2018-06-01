@@ -121,6 +121,81 @@ int executa(LCMD comando,int fd_origin){
 	_exit(0);
 }
 
+
+int executa_n(LCMD comando,int fd_origin,char * input){
+	int p[2];
+	int n,c= 0, status;
+	char ** args = NULL;
+	LCMD aux_comando;
+	char * str_aux;
+	int size = 1024;
+	char * buffer = malloc(size*sizeof(char));
+	char x;
+	int i = 0,k = 0;
+	pid_t a;
+
+	for(aux_comando = comando; aux_comando; aux_comando = aux_comando->prox)
+		k++;
+
+	char ** buffer_2 = malloc(k*sizeof(char *));
+	pipe(p);
+	dup2(p[1],1);
+	write(1,input,sizeof(input));
+
+	for(aux_comando = comando; aux_comando; aux_comando = aux_comando->prox, c++){
+
+		pipe(p);
+        n = fork();
+        if(n==0){
+			dup2(p[1],1);
+            close(p[1]);close(p[0]);
+			args = split_string(aux_comando->comando);
+			execvp(args[1],args + 1);
+			perror("Fail no exec");
+            _exit(-1);
+        }
+        else{
+			close(p[1]);
+			dup2(p[0],0);
+			close(p[0]);
+			while (read(0,&x,1) > 0){
+				buffer[i] = x;
+				i++;
+				if (i == size){
+					str_aux = buffer;
+					buffer = malloc(size*2*sizeof(char));
+					for(k = 0; k < size; k++){
+						buffer[k] = str_aux[k];
+					}
+					free(str_aux);
+					size *= 2;
+				}
+			}
+			pipe(p);
+
+			buffer[i] = '\0';
+			write(p[1],buffer,i);
+
+			str_aux = malloc((i+1)*sizeof(char));
+			strcpy(str_aux,buffer);
+			buffer_2[c] = str_aux;
+
+			i = 0;
+			close(p[1]); dup2(p[0],0); close(p[0]);
+			wait(&status);
+			if (WIFEXITED(status)){
+				a = WEXITSTATUS(status);
+				if (a == 255)
+					_exit(-1);
+        	}
+			alarm(0);
+		}
+	}
+	juntaFildes(fd_origin,c,comando,buffer_2);
+
+	_exit(0);
+}
+
 /**
 	@brief			Função responsável por atribuir um tipo a uma string.
 	@param source	String a avaliar.

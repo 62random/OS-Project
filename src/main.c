@@ -18,6 +18,9 @@ char * buffer_safe_mode;
 int size;
 int k;
 char const * filesource;
+int * paused_process;
+int n_paused_process;
+int n_paused_size;
 
 void removeFiles(){
 	if(!fork()){
@@ -97,9 +100,27 @@ void kill_all(int i){
 
 }
 
+void kill_all(int i){
+
+	pid_t self = getpid();
+    if (daddy == self){
+		for(int j = 0; j < n_paused_process; j++){
+			kill(SIGCONT,paused_process[j]);
+		}
+	}
+
+}
+
+
 int main(int argc, char const *argv[]) {
+	int fork_pid_aux;
+	n_paused_size = 10;
+	n_paused_process = 0;
+	paused_process = malloc(sizeof(int) * n_paused_size);
 	daddy = getpid();
 	signal(SIGINT,kill_all);
+	signal(SIGALRM,lidar_alarm);
+
 
 	if (argc != 2) {
 		perror("Numero de argumentos inválido");
@@ -128,6 +149,8 @@ int main(int argc, char const *argv[]) {
 		_exit(-1);
 	}
 	mkdir(LOCAL,0777);
+	for(d = 0; v[d]; d++)
+		printf("%d\n",v[d] );
 
 	//fd = open(argv[1], O_RDONLY , 00644);
 
@@ -140,9 +163,26 @@ int main(int argc, char const *argv[]) {
 			printf("n:%d -> linha:%d -> coluna:%d\n",n_com,linha,coluna);
 		}*/
 
-		if(!fork()){
-      		executa(comandos[d],d);
-			_exit(0);
+
+		if(type(comandos[d]->comando) == 1){
+			fork_pid_aux = fork();
+			if(fork_pid_aux){
+				if(++n_paused_process >= n_paused_size){
+					free(paused_process);
+					n_paused_size *= 2;
+					paused_process = malloc(sizeof(int) * n_paused_size);
+				}
+				paused_process[n_paused_process++] = fork_pid_aux;
+			}
+			//funcao ambrosio com output
+			executa_n(comandos[d],d,input);
+
+		}
+		else{
+			if(!fork()){
+				executa(comandos[d],d);
+				_exit(0);
+			}
 		}
 	}
 

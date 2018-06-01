@@ -111,6 +111,20 @@ int main(int argc, char const *argv[]) {
 	close(fd);
 	int p[2],v[r];
 	pid_t a;
+	MSTRING output = initMS(r);
+
+	/*
+	for(d = 0; d < r; d++){
+		aux = comandos[d];
+		while (aux) {
+			printf("%s\n",aux->desc);
+			printf("%s\n",aux->comando);
+
+			aux = aux->prox;
+		}
+		printf("Next\n");
+	}*/
+
 
 	for(d = 0; d < r; d++){
 		pipe(p);

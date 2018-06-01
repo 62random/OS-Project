@@ -1,23 +1,18 @@
 #include "parser.h"
 
-
-typedef struct string_matrix{
-	int size;
-	int ocupados;
-	char ** matrix;
-} * MSTRING;
-
 /**
 	@brief			Função responsável inicializar um apontador para strings.
 	@param  size 	Tamanho do apontador para strings.
 	@return 		Estrutura com o apontador para strings.
 */
 
-static MSTRING initMS(int size){
+MSTRING initMS(int size){
 	MSTRING aux = malloc(sizeof(struct string_matrix));
 	aux->size = size;
 	aux->ocupados = 0;
 	aux->matrix = malloc(size*sizeof(char *));
+	for(int i = 0; i < aux->size; i++)
+		aux->matrix[i] = NULL;
 
 	return aux;
 }
@@ -28,7 +23,7 @@ static MSTRING initMS(int size){
 	@param  ms 		Estrutura com a apontador para strings.
 */
 
-static void addMatrix(char * str, MSTRING ms){
+void addMatrix(char * str, MSTRING ms){
 	if (!ms)
 		return;
 
@@ -48,11 +43,26 @@ static void addMatrix(char * str, MSTRING ms){
 }
 
 /**
+	@brief			Função responsável por adicionar um elemento a uma apontador para strings numa dada posicao.
+	@param	str 	Adicionar uma apontador para strings.
+	@param  ms 		Estrutura com a apontador para strings.
+	@param  i 		Indice a escrever.
+*/
+
+void addMatrixIndex(char * str, MSTRING ms, int i){
+	if (!ms)
+		return;
+	if (i >= ms->size) return;
+
+	ms->matrix[i] = str;
+}
+
+/**
 	@brief			Função responsável por dar free a uma apontador para strings.
 	@param  ms 		Estrutura com o apontador para strings.
 */
 
-static void freeMString(MSTRING ms){
+void freeMString(MSTRING ms){
 	int i;
 
 	for(i = 0; i < ms->ocupados; i++)
@@ -175,7 +185,7 @@ LCMD parser(int fildes){
 	freeMString(matrix);
 
 	percorre = start;
-	
+
 	while(percorre){
 		if (test_dollar(percorre->desc)){
 			str_ant = percorre->desc;

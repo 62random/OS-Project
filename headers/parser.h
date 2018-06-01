@@ -8,6 +8,12 @@
 #include <string.h>
 #include <math.h>
 
+typedef struct string_matrix{
+	int size;
+	int ocupados;
+	char ** matrix;
+} * MSTRING;
+
 typedef struct linhacmd{
 	char * desc;
 	char * comando;
@@ -15,7 +21,9 @@ typedef struct linhacmd{
 } * LCMD;
 
 
-
+MSTRING initMS			(int size);
+void 	addMatrix		(char * str, MSTRING ms);
+void 	freeMString		(MSTRING ms);
 int 	readln			(int fildes, char *buf, int nbyte);
 LCMD 	criarCMD		(char * src1,char * src2);
 int 	type_string		(char * str);

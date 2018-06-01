@@ -7,8 +7,25 @@
 	@param	comando Struct com a informação sobre o comando executado e a sua descrição.
 */
 
-void escreveFicheiroAux(int fp, char * str , LCMD comando){
+char * escreveFicheiroAux(char * final,int * size,int * k, char * str , LCMD comando){
+	int i = *k,x;
+	int size1 = *size;
+	char * aux;
 
+	if (comando->desc != NULL){
+		if ((size1-i) < strlen(comando->desc)){
+			size1 += 2*strlen(comando->desc);
+			aux = final;
+			final = malloc(size1*sizeof(char));
+			for(x = 0; x < i; x++)
+				final[x] = aux[x];
+			free(aux);
+		}
+		write(fp,comando->desc,strlen(comando->desc));
+		write(fp,"\n",1);
+	}
+
+	/*
 	if (comando->desc != NULL){
 		write(fp,comando->desc,strlen(comando->desc));
 		write(fp,"\n",1);
@@ -17,7 +34,7 @@ void escreveFicheiroAux(int fp, char * str , LCMD comando){
 	write(fp,"\n",1);
 	write(fp,">>>\n",4);
 	write(fp,str,strlen(str)+1);
-	write(fp,"<<<\n",4);
+	write(fp,"<<<\n",4);*/
 }
 
 /**
@@ -28,11 +45,13 @@ void escreveFicheiroAux(int fp, char * str , LCMD comando){
 	@param 	buffer			Apontador de strings com os vários resultados dos comandos.
 */
 
-void juntaFildes(int d_pai,int d_max_filho,LCMD comando,char ** buffer){
+char * juntaFildes(int d_pai,int d_max_filho,LCMD comando,char ** buffer){
 	int i;
+	int size = 100;
+	char * str = malloc(size*sizeof(char));
 
 	for(i = 0; i < d_max_filho; i++, comando = comando->prox){
-		escreveFicheiroAux(d_pai,buffer[i],comando);
+		str = escreveFicheiroAux(str,&size,&k,buffer[i],comando);
 	}
 }
 
@@ -72,9 +91,7 @@ int executa(LCMD comando,int fd_origin){
             _exit(-1);
         }
         else{
-			close(p[1]);
-			dup2(p[0],0);
-			close(p[0]);
+			close(p[1]); dup2(p[0],0);close(p[0]);
 			while (read(0,&x,1) > 0){
 				buffer[i] = x;
 				i++;
@@ -171,4 +188,28 @@ int posicaoArray(LCMD * l, int pos, int n,	int * ele){
 	*ele = i_col;
 
 	return i_array;
+}
+
+/**
+	@brief				Função responsável por calcular o número que está no input.
+	@param 	source		String com o comando.
+	@return				Número a ser lido.
+*/
+
+int n_comando(char * source){
+	char * buffer = NULL;
+	int i=1;
+	int r= -1;
+
+	if (type(source) == 1){
+		buffer = malloc(100*sizeof(char));
+		while(source[i] != '|'){
+			buffer[i-1] = source[i];
+			i++;
+		}
+		buffer[i]='\0';
+		r = atoi(buffer);
+	}
+
+	return r;
 }

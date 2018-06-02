@@ -7,26 +7,28 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <stdio.h>
+#include <signal.h>
 
 
 
 #define TAM_STR 50
 #define TAM_STR_MAIN 100
+#define RUNNING 1
+#define PAUSED 0
+#define FINISHED 2
+#define NOSTARTED -1
 
 pid_t daddy;
 char * buffer_safe_mode;
 int size;
 int k;
 char const * filesource;
-int * paused_process;
-int n_paused_process;
-int n_paused_size;
+int * process_status;
+int * process_link;
+int * dependencias;
+int r;
 
-void removeFiles(){
-	if(!fork()){
-		execlp("rm","rm","-r",LOCAL,NULL);
-	}
-}
+void removeFilesW();
 
 /**
 	@brief			Função responsável por criar um backup do ficheiro inicial.
@@ -61,6 +63,12 @@ void backup_read(char const * source){
 	}
 	k = i;
 	close(fd);
+}
+
+void removeFiles(){
+	if(!fork()){
+		execlp("rm","rm","-r",LOCAL,NULL);
+	}
 }
 
 /**
@@ -100,28 +108,58 @@ void kill_all(int i){
 
 }
 
-void mandar_alarm(int i){
-	wait(NULL);
-	for(int j = 0; j < n_paused_process; j++){
-		kill(SIGCONT,paused_process[j]);
-	}
+void wakeup(int i){
+	int status,pid,a,d;
 
+	pid = wait(&status);
+
+	if (pid != -1){
+		if (WIFEXITED(status)){
+			a = WEXITSTATUS(status);
+			if (a == 255){
+				removeFiles();
+				_exit(-1);
+			}
+		}
+		a=0;
+		while (process_link[a] != pid && a < r){
+			a++;
+		}
+		d = a;
+		process_status[d] = FINISHED;
+		for(a = 0; a < r; a++){
+			if(dependencias[a] == d){
+				kill(process_link[a],SIGCONT);
+				process_status[a] = RUNNING;
+			}
+		}
+	}
+}
+
+void removeFilesW(){
+	backup_write();
+	if(!fork()){
+		execlp("rm","rm","-r",LOCAL,NULL);
+	}
+}
+
+int verificaArray(){
+	int i = 0;
+	while(i < r && process_status[i] == 2){
+		i++;
+	}
+	return (i != r);
 }
 
 
 int main(int argc, char const *argv[]) {
 
 	signal(SIGINT,kill_all);
-	signal(SIGCHLD,mandar_alarm);
-
+	signal(SIGCHLD,wakeup);
 
 	int fork_pid_aux;
-	n_paused_size = 10;
-	n_paused_process = 0;
 
 	daddy = getpid();
-
-
 
 	if (argc != 2) {
 		perror("Numero de argumentos inválido");
@@ -139,67 +177,55 @@ int main(int argc, char const *argv[]) {
 	}
 
 	LCMD aux = parser(fd);
-	int r = 0,d,fd1,n,status;
+	int d,fd1,n,status;
 	LCMD * comandos = parser_split(aux,&r);
 	close(fd);
 	pid_t a;
-	int linha,coluna,n_com, v[r];
+	int linha,coluna;
 
-	if(!calculaDependencias(comandos,v,r)){
+	dependencias = malloc(sizeof(int) * r);
+
+	if(!calculaDependencias(comandos,dependencias,r)){
 		perror("Um dos comandos do tipo $n| não pode ser executado.");
 		_exit(-1);
 	}
 	mkdir(LOCAL,0777);
 
-	paused_process = malloc(sizeof(int) * length(v));
+	process_status = malloc(sizeof(int) * r);
+	process_link = malloc(sizeof(int)*r);
 
+	char * input;
 
 	for(d = 0; d < r; d++){
-		/*
-		char *blasd = parseFileToString(2,fd);
-		if (type(comandos[d]->comando) == 1){
-			n_com = n_comando(comandos[d]->comando);
-			linha = posicaoArray(comandos,d,n_com,&coluna);
-			printf("n:%d -> linha:%d -> coluna:%d\n",n_com,linha,coluna);
-		}*/
-
-
+		process_status[d] = NOSTARTED;
 		if(type(comandos[d]->comando) == 1){ // n-esimo
 			fork_pid_aux = fork();
 			if(fork_pid_aux){
-				paused_process[n_paused_process++] = fork_pid_aux;
+				process_link[d] = fork_pid_aux;
+				process_status[d] = PAUSED;
+				kill(fork_pid_aux,SIGSTOP);
 			}
 			else{
-				printf("wait\n");
-			int coluna;
-			int dependencia_n = posicaoArray(comandos, d, n_comando(comandos[d]->comando), &coluna);
-			int flag = 1;
-
-			while(flag){
-				if (ja_acabou(dependencia_n, coluna)){//ja acabou
-					printf("FIM\n");
-					flag = 0;
-				}
-				else{
-					printf("PAUSAR\n");
-					pause();
-				}
+				linha = posicaoArray(comandos, d, n_comando(comandos[d]->comando), &coluna);
+				input = outputFromFile(linha, coluna);
+				executa_n(comandos[d],d,input);
+				_exit(0);
 			}
-			//funcao ambrosio com output
-			char * input = outputFromFile(dependencia_n, coluna);
-			//executa_n(comandos[d],d,input);
-
-			}
-
 		}
 		else{ // normal
-			if(!fork()){
+			fork_pid_aux = fork();
+			if(!fork_pid_aux){
 				executa(comandos[d],d);
 				_exit(0);
+			}
+			else{
+				process_link[d] = fork_pid_aux;
+				process_status[d] = RUNNING;
 			}
 		}
 	}
 
+	/*
 	for(d = 0; d < r; d++){
 		wait(&status);
 		if (WIFEXITED(status)){
@@ -209,7 +235,8 @@ int main(int argc, char const *argv[]) {
 				_exit(-1);
 			}
 		}
-	}
+	}*/
+	while(verificaArray());
 
 	fd = open(argv[1], O_WRONLY | O_TRUNC, 00644);
 	if (fd == -1){
@@ -217,7 +244,6 @@ int main(int argc, char const *argv[]) {
 		removeFiles();
 		_exit(-1);
 	}
-
 	char c;
 	char str [100];
 
@@ -228,7 +254,7 @@ int main(int argc, char const *argv[]) {
 
 		if (fd1 == -1){
 			perror("Não conseguiu abrir a porta do ficheiro.");
-			removeFiles();
+			removeFilesW();
 			_exit(-1);
 		}
 

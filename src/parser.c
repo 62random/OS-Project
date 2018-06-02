@@ -67,30 +67,9 @@ static void freeMString(MSTRING ms){
 	@param  buf	   	Apontador para onde vai ser lido.
 	@param  nbyte	Número de elementos máximos do array.
 */
-/*
-int readln(int fildes, char *buf, int nbyte){
-    int num = 0,n,i;
-    char c = *buf;
-
-    while( c != '\n' && num < nbyte){
-        n = read(fildes,buf+num,1);
-		if (n == 0)
-			break;
-		num += n;
-        c = *(buf + num-1);
-    }
-
-	for(i = 0 ; i < num; i++)
-		if ((*(buf + i)) == '\n'){
-			*(buf + i) = '\0';
-			break;
-		}
-
-    return num;
-}*/
 
 int readln(int fildes, char *buf, int nbyte){
-    int num = 0,n,i;
+    int num = 0,n;
     char c ;
 	int flag = 0;
 
@@ -108,13 +87,6 @@ int readln(int fildes, char *buf, int nbyte){
 	if (num < nbyte && num != 0){
 		buf[num++] = '\0';
 	}
-
-	/*
-	for(i = 0 ; i < num; i++)
-		if ((*(buf + i)) == '\n'){
-			*(buf + i) = '\0';
-			break;
-		}*/
 
     return num;
 }

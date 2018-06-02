@@ -124,32 +124,28 @@ int executa(LCMD comando,int fd_origin){
 	_exit(0);
 }
 
-
 int executa_n(LCMD comando,int fd_origin,char * input){
-	int p[2];
-	int n,c= 0, status;
+	int p[2],n,c = 0, status,size = 1024,i = 0, k = 0,p1[2];
 	char ** args = NULL;
-	LCMD aux_comando;
-	char * str_aux;
-	int size = 1024;
-	char * buffer = malloc(size*sizeof(char));
-	char x;
-	int i = 0,k = 0;
+	char * buffer = malloc(size*sizeof(char)), * str_aux, x;
 	pid_t a;
+	LCMD aux_comando;
 
 	for(aux_comando = comando; aux_comando; aux_comando = aux_comando->prox)
 		k++;
-
 	char ** buffer_2 = malloc(k*sizeof(char *));
-	pipe(p);
-	dup2(p[1],1);
-	write(1,input,sizeof(input));
 
 	for(aux_comando = comando; aux_comando; aux_comando = aux_comando->prox, c++){
-
+		if (c == 0)
+			pipe(p1);
 		pipe(p);
         n = fork();
         if(n==0){
+			if (c == 0){
+				close(p1[1]);
+				dup2(p1[0],0);
+				close(p1[0]);
+			}
 			dup2(p[1],1);
             close(p[1]);close(p[0]);
 			args = split_string(aux_comando->comando);
@@ -158,6 +154,11 @@ int executa_n(LCMD comando,int fd_origin,char * input){
             _exit(-1);
         }
         else{
+			if (c==0){
+				close(p1[0]);
+				write(p1[1],input,strlen(input)+1);
+				close(p1[1]);
+			}
 			close(p[1]);
 			dup2(p[0],0);
 			close(p[0]);
@@ -186,12 +187,13 @@ int executa_n(LCMD comando,int fd_origin,char * input){
 			i = 0;
 			close(p[1]); dup2(p[0],0); close(p[0]);
 			wait(&status);
+
 			if (WIFEXITED(status)){
 				a = WEXITSTATUS(status);
 				if (a == 255)
 					_exit(-1);
         	}
-			alarm(0);
+
 		}
 	}
 	juntaFildes(fd_origin,c,comando,buffer_2);

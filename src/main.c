@@ -20,8 +20,6 @@ int size;
 int k;
 char const * filesource;
 
-void removeFilesW();
-
 /**
 	@brief			Função responsável por criar um backup do ficheiro inicial.
 	@param  source 	Path para o file
@@ -57,12 +55,6 @@ void backup_read(char const * source){
 	close(fd);
 }
 
-void removeFiles(){
-	if(!fork()){
-		execlp("rm","rm","-r",LOCAL,NULL);
-	}
-}
-
 /**
 	@brief			Função responsável escrever o backup no ficheiro.
 */
@@ -79,6 +71,10 @@ void backup_write(){
 	close(fd);
 }
 
+/**
+	@brief			Função utilizada no SIGINT.
+*/
+
 
 void kill_all(int i){
 
@@ -86,9 +82,6 @@ void kill_all(int i){
     if (daddy != self) _exit(-1);
 	else{
 		printf("A sair de todos os processos\n" );
-		if(!fork()){
-			execlp("rm","rm","-r",LOCAL,NULL);
-		}
 		wait(NULL);
 		backup_write();
 		_exit(0);

@@ -1,8 +1,0 @@
-lista ps
-$   ps
-a segunda cena
-$|  head -2
-wordcount é fixe
-$1| wc
-grep a pid
-$3| grep PID

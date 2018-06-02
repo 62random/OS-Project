@@ -14,10 +14,11 @@
 #define TAM_STR 50
 #define TAM_STR_MAIN 100
 
+pid_t daddyold;
 pid_t daddy;
 char * buffer_safe_mode;
 int size;
-int k;
+int ocupados;
 char const * filesource;
 
 /**
@@ -51,7 +52,7 @@ void backup_read(char const * source){
 			size *= 2;
 		}
 	}
-	k = i;
+	ocupados = i;
 	close(fd);
 }
 
@@ -67,7 +68,7 @@ void backup_write(){
 		_exit(-1);
 	}
 
-	write(fd,buffer_safe_mode,k);
+	write(fd,buffer_safe_mode,ocupados);
 	close(fd);
 }
 
@@ -79,32 +80,32 @@ void backup_write(){
 void kill_all(int i){
 
 	pid_t self = getpid();
-    if (daddy != self) _exit(-1);
+    if (daddy != self && daddyold != self) _exit(-1);
 	else{
 		printf("A sair de todos os processos\n" );
-		wait(NULL);
-		backup_write();
-		_exit(0);
+		if (self == daddy){
+			backup_write();
+			_exit(-1);
+		}
+		else _exit(0);
 	}
 
+
+
+/**
+	@brief			Função que executa um ficheiro singular.
+	@param   argv	Path para o ficheiro.
+*/
 }
 
+int executaSingleFile(char const * argv){
 
-int main(int argc, char const *argv[]) {
+	daddy= getpid();
 
-	signal(SIGINT,kill_all);
+	filesource = argv;
+	backup_read(argv);
 
-	daddy = getpid();
-
-	if (argc != 2) {
-		perror("Numero de argumentos inválido");
-		exit(-1);
-	}
-
-	filesource = argv[1];
-	backup_read(argv[1]);
-
-	int fd = open(argv[1], O_RDONLY , 00644);
+	int fd = open(argv, O_RDONLY , 00644);
 
 	if (fd == -1){
 		perror("Não conseguiu abrir a porta do ficheiro.");
@@ -136,6 +137,7 @@ int main(int argc, char const *argv[]) {
 			}
 			else executa(comandos[d],p[1]);
 			close(p[1]);
+			_exit(0);
 		}
 		else{
 			close(p[1]);
@@ -157,16 +159,67 @@ int main(int argc, char const *argv[]) {
 	}
 	free(comandos);
 
-	fd = open(argv[1], O_WRONLY | O_TRUNC, 00644);
+	fd = open(argv, O_WRONLY | O_TRUNC, 00644);
 	if (fd == -1){
 		perror("Não conseguiu abrir a porta do ficheiro.");
 		_exit(-1);
 	}
-
 	for(d = 0; d < r; d++){
 		write(fd,output[d],strlen(output[d]));
 	}
+
 	close(fd);
+	free(buffer_safe_mode);
+	for(d= 0; d < r; d++){
+		str_aux = output[d];
+		free(str_aux);
+	}
+	free(output);
+
+	_exit(0);
+}
+
+/**
+	@brief			Função que verifica se há dois ficheiros com o mesmo nome.
+	@param   argv	Nome dos ficheiros.
+	@param	 i		Indice em que se começa a procurar.
+	@return 		Boolean com o resultado.
+*/
+
+int checkFileName(char const *argv[],int i){
+	int d,counter = 0;
+	for(d=i-1; d >= 1; d--){
+		if (strcmp(argv[i],argv[d]) == 0)
+			counter++;
+	}
+
+	return (counter == 0);
+}
+
+
+int main(int argc, char const *argv[]) {
+
+	signal(SIGINT,kill_all);
+
+	daddyold = getpid();
+
+	if (argc < 2) {
+		perror("Numero de argumentos inválido");
+		exit(-1);
+	}
+
+	int i;
+	for(i=1; i < argc; i++){
+		if (checkFileName(argv,i)){
+			if(!fork()){
+				executaSingleFile(argv[i]);
+				_exit(0);
+			}
+		}
+	}
+	for(i=1; i < argc; i++){
+		wait(NULL);
+	}
 
 	return 1;
 }

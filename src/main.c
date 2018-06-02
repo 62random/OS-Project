@@ -197,23 +197,19 @@ int main(int argc, char const *argv[]) {
 	process_status = malloc(sizeof(int) * r);
 	process_link = malloc(sizeof(int)*r);
 
-	for(d=0; d < r;d++)
-		printf("%d\n",dependencias[d]);
-
-
 	for(d = 0; d < r; d++){
 		process_status[d] = NOSTARTED;
 		if(type(comandos[d]->comando) == 1){ // n-esimo
 			fork_pid_aux = fork();
-			if(fork_pid_aux){
+			if(fork_pid_aux != 0){
 				process_link[d] = fork_pid_aux;
 				process_status[d] = PAUSED;
 				kill(fork_pid_aux,SIGSTOP);
 			}
 			else{
 				linha = posicaoArray(comandos, d, n_comando(comandos[d]->comando), &coluna);
-				input = outputFromFile(linha, coluna);
-				executa_n(comandos[d],d,input);
+				//input = outputFromFile(linha, coluna);
+				//executa_n(comandos[d],d,input);
 				_exit(0);
 			}
 		}

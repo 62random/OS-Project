@@ -110,7 +110,6 @@ int executa(LCMD comando,int fd_origin){
 			i = 0;
 			close(p[1]); dup2(p[0],0); close(p[0]);
 			wait(&status);
-			alarm(0);
 
 			if (WIFEXITED(status)){
 				a = WEXITSTATUS(status);
@@ -132,11 +131,11 @@ int executa_n(LCMD comando,int fd_origin,char * input){
 	pid_t a;
 	LCMD aux_comando;
 
-	printf("%s\n", input);
-
 	for(aux_comando = comando; aux_comando; aux_comando = aux_comando->prox)
 		k++;
 	char ** buffer_2 = malloc(k*sizeof(char *));
+
+	pipe(p1);
 
 	for(aux_comando = comando; aux_comando; aux_comando = aux_comando->prox, c++){
 		if (c == 0)
@@ -163,16 +162,14 @@ int executa_n(LCMD comando,int fd_origin,char * input){
 				close(p1[1]);
 			}
 			close(p[1]);
-			dup2(p[0],0);
-			close(p[0]);
-
 			wait(&status);
 			if (WIFEXITED(status)){
 				a = WEXITSTATUS(status);
 				if (a == 255)
 					_exit(-1);
 			}
-			while (read(0,&x,1) > 0){
+
+			while (read(p[0],&x,1) > 0){
 				buffer[i] = x;
 				i++;
 				if (i == size){
@@ -185,13 +182,13 @@ int executa_n(LCMD comando,int fd_origin,char * input){
 					size *= 2;
 				}
 			}
+			close(p[0]);
 			pipe(p);
 
 			buffer[i] = '\0';
 			write(p[1],buffer,i);
-			printf("%s\n",buffer);
 
-			str_aux = malloc((i+1)*sizeof(char));
+			str_aux = malloc(i*sizeof(char));
 			strcpy(str_aux,buffer);
 			buffer_2[c] = str_aux;
 

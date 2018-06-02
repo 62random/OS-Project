@@ -109,11 +109,14 @@ int executa(LCMD comando,int fd_origin){
 			i = 0;
 			close(p[1]); dup2(p[0],0); close(p[0]);
 			wait(&status);
+			alarm(0);
+
 			if (WIFEXITED(status)){
 				a = WEXITSTATUS(status);
 				if (a == 255)
 					_exit(-1);
         	}
+
 		}
 	}
 	juntaFildes(fd_origin,c,comando,buffer_2);
@@ -317,4 +320,14 @@ char * outputFromFile(int dependencia,int coluna){
 	close(fd);
 
 	return result;
+}
+
+int ja_acabou(int dep, int col){
+
+	char path[100];
+	sprintf(path,"%s/aux_%d",LOCAL,dep);
+	char buffer[100];
+
+	return 1;
+
 }

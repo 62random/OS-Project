@@ -100,26 +100,27 @@ void kill_all(int i){
 
 }
 
-void kill_all(int i){
-
-	pid_t self = getpid();
-    if (daddy == self){
-		for(int j = 0; j < n_paused_process; j++){
-			kill(SIGCONT,paused_process[j]);
-		}
+void mandar_alarm(int i){
+	wait(NULL);
+	for(int j = 0; j < n_paused_process; j++){
+		kill(SIGCONT,paused_process[j]);
 	}
 
 }
 
 
 int main(int argc, char const *argv[]) {
+
+	signal(SIGINT,kill_all);
+	signal(SIGCHLD,mandar_alarm);
+
+
 	int fork_pid_aux;
 	n_paused_size = 10;
 	n_paused_process = 0;
-	paused_process = malloc(sizeof(int) * n_paused_size);
+
 	daddy = getpid();
-	signal(SIGINT,kill_all);
-	signal(SIGALRM,lidar_alarm);
+
 
 
 	if (argc != 2) {
@@ -149,10 +150,9 @@ int main(int argc, char const *argv[]) {
 		_exit(-1);
 	}
 	mkdir(LOCAL,0777);
-	for(d = 0; v[d]; d++)
-		printf("%d\n",v[d] );
 
-	//fd = open(argv[1], O_RDONLY , 00644);
+	paused_process = malloc(sizeof(int) * length(v));
+
 
 	for(d = 0; d < r; d++){
 		/*
@@ -164,21 +164,35 @@ int main(int argc, char const *argv[]) {
 		}*/
 
 
-		if(type(comandos[d]->comando) == 1){
+		if(type(comandos[d]->comando) == 1){ // n-esimo
 			fork_pid_aux = fork();
 			if(fork_pid_aux){
-				if(++n_paused_process >= n_paused_size){
-					free(paused_process);
-					n_paused_size *= 2;
-					paused_process = malloc(sizeof(int) * n_paused_size);
-				}
 				paused_process[n_paused_process++] = fork_pid_aux;
 			}
+			else{
+				printf("wait\n");
+			int coluna;
+			int dependencia_n = posicaoArray(comandos, d, n_comando(comandos[d]->comando), &coluna);
+			int flag = 1;
+
+			while(flag){
+				if (ja_acabou(dependencia_n, coluna)){//ja acabou
+					printf("FIM\n");
+					flag = 0;
+				}
+				else{
+					printf("PAUSAR\n");
+					pause();
+				}
+			}
 			//funcao ambrosio com output
-			executa_n(comandos[d],d,input);
+			char * input = outputFromFile(dependencia_n, coluna);
+			//executa_n(comandos[d],d,input);
+
+			}
 
 		}
-		else{
+		else{ // normal
 			if(!fork()){
 				executa(comandos[d],d);
 				_exit(0);

@@ -229,5 +229,17 @@ int main(int argc, char const *argv[]) {
 		wait(NULL);
 	}
 
+	char * aux;
+	free(ocupados_a);
+	for(i=0; i < arg; i++){
+		if (sizes[i] != -1){
+			aux = buffer_safe_mode[i];
+			free(aux);
+		}
+	}
+	free(buffer_safe_mode);
+	free(FILES);
+	free(sizes);
+
 	return 1;
 }

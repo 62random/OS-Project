@@ -13,10 +13,6 @@
 
 #define TAM_STR 50
 #define TAM_STR_MAIN 100
-#define RUNNING 1
-#define PAUSED 0
-#define FINISHED 2
-#define NOSTARTED -1
 
 pid_t daddy;
 char * buffer_safe_mode;

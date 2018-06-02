@@ -118,6 +118,24 @@ LCMD criarCMD(char * src1 ,char * src2){
 }
 
 /**
+	@brief			Função responsável por dar free a um linha de comandos.
+	@param  linha 	Linha a dar free.
+*/
+
+void freeCMD(LCMD linha){
+	LCMD aux;
+	while (linha) {
+		aux = linha;
+		linha= linha ->prox;
+		if (aux->desc != NULL)
+			free(aux->desc);
+		if (aux->comando != NULL)
+			free(aux->comando);
+		free(aux);
+	}
+}
+
+/**
 	@brief			Função responsável verificar o tipo de comando inseriro.
 	@param  str 	String a verificar.
 	@return 		Boolean.

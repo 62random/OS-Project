@@ -151,6 +151,11 @@ int main(int argc, char const *argv[]) {
 		}
 	}
 
+	for(d=0; d < r; d++){
+		aux = comandos[d];
+		freeCMD(aux);
+	}
+	free(comandos);
 
 	fd = open(argv[1], O_WRONLY | O_TRUNC, 00644);
 	if (fd == -1){

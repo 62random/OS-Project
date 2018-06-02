@@ -279,6 +279,10 @@ int n_comando(char * source){
 	if (type(source) == 1){
 		buffer = malloc(100*sizeof(char));
 		while(source[i] != '|'){
+			if (!isdigit(source[i])){
+				perror("Um dos comandos $n| não contém números");
+				_exit(-1);
+			}
 			buffer[i-1] = source[i];
 			i++;
 		}

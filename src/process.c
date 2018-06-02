@@ -36,6 +36,7 @@ void juntaFildes(int d_pai,int d_max_filho,LCMD comando,char ** buffer){
 	int fd = open(str,O_CREAT | O_WRONLY,0644);
 
 	if (fd == -1){
+		printf("%s\n",str);
 		perror("Não conseguiu abrir a porta do ficheiro.");
 		_exit(-1);
 	}
@@ -131,6 +132,8 @@ int executa_n(LCMD comando,int fd_origin,char * input){
 	pid_t a;
 	LCMD aux_comando;
 
+	printf("%s\n", input);
+
 	for(aux_comando = comando; aux_comando; aux_comando = aux_comando->prox)
 		k++;
 	char ** buffer_2 = malloc(k*sizeof(char *));
@@ -156,12 +159,19 @@ int executa_n(LCMD comando,int fd_origin,char * input){
         else{
 			if (c==0){
 				close(p1[0]);
-				write(p1[1],input,strlen(input)+1);
+				write(p1[1],input,strlen(input));
 				close(p1[1]);
 			}
 			close(p[1]);
 			dup2(p[0],0);
 			close(p[0]);
+
+			wait(&status);
+			if (WIFEXITED(status)){
+				a = WEXITSTATUS(status);
+				if (a == 255)
+					_exit(-1);
+			}
 			while (read(0,&x,1) > 0){
 				buffer[i] = x;
 				i++;
@@ -179,6 +189,7 @@ int executa_n(LCMD comando,int fd_origin,char * input){
 
 			buffer[i] = '\0';
 			write(p[1],buffer,i);
+			printf("%s\n",buffer);
 
 			str_aux = malloc((i+1)*sizeof(char));
 			strcpy(str_aux,buffer);
@@ -186,14 +197,6 @@ int executa_n(LCMD comando,int fd_origin,char * input){
 
 			i = 0;
 			close(p[1]); dup2(p[0],0); close(p[0]);
-			wait(&status);
-
-			if (WIFEXITED(status)){
-				a = WEXITSTATUS(status);
-				if (a == 255)
-					_exit(-1);
-        	}
-
 		}
 	}
 	juntaFildes(fd_origin,c,comando,buffer_2);

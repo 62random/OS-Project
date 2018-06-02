@@ -290,7 +290,7 @@ void freeApChar(char ** str){
 	}
 }
 
-char * mystrcat(char * str1, char * str2, int * size,int * i){
+char * mystrcat(char * str1, char * str2, int * size,int * i,int o){
 	int size1 = *size;
 	int i1 = * i, flag = 0;
 	int size2 = strlen(str2);
@@ -308,9 +308,10 @@ char * mystrcat(char * str1, char * str2, int * size,int * i){
 	}
 	strcat(str1,str2);
 	i1 += size2;
-
-	strcat(str1,"\n");
-	i1++;
+	if (o){
+		strcat(str1,"\n");
+		i1++;
+	}
 
 	*size = size1;
 	*i = i1;
@@ -340,7 +341,7 @@ char * parseFileToString(int coluna,int fd){
 	int size = 100, i = 0;
 
 	while(n < matrix->ocupados && strcmp(matrix->matrix[n],"<<<") != 0){
-		str2 = mystrcat(str2,matrix->matrix[n],&size,&i);
+		str2 = mystrcat(str2,matrix->matrix[n],&size,&i,1);
 		n++;
 	}
 	freeMString(matrix);

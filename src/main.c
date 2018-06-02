@@ -172,6 +172,7 @@ int main(int argc, char const *argv[]) {
 	int fd = open(argv[1], O_RDONLY , 00644);
 
 	if (fd == -1){
+		printf("Porta inicial\n");
 		perror("Não conseguiu abrir a porta do ficheiro.");
 		_exit(-1);
 	}
@@ -191,10 +192,14 @@ int main(int argc, char const *argv[]) {
 	}
 	mkdir(LOCAL,0777);
 
+	char * input;
+
 	process_status = malloc(sizeof(int) * r);
 	process_link = malloc(sizeof(int)*r);
 
-	char * input;
+	for(d=0; d < r;d++)
+		printf("%d\n",dependencias[d]);
+
 
 	for(d = 0; d < r; d++){
 		process_status[d] = NOSTARTED;
@@ -224,22 +229,12 @@ int main(int argc, char const *argv[]) {
 			}
 		}
 	}
-
-	/*
-	for(d = 0; d < r; d++){
-		wait(&status);
-		if (WIFEXITED(status)){
-			a = WEXITSTATUS(status);
-			if (a == 255){
-				removeFiles();
-				_exit(-1);
-			}
-		}
-	}*/
 	while(verificaArray());
+
 
 	fd = open(argv[1], O_WRONLY | O_TRUNC, 00644);
 	if (fd == -1){
+		printf("Foi no file inicial\n");
 		perror("Não conseguiu abrir a porta do ficheiro.");
 		removeFiles();
 		_exit(-1);
@@ -253,6 +248,7 @@ int main(int argc, char const *argv[]) {
 		fd1 = open(str,O_RDONLY,0644);
 
 		if (fd1 == -1){
+			printf("Foi no file%d\n",d);
 			perror("Não conseguiu abrir a porta do ficheiro.");
 			removeFilesW();
 			_exit(-1);

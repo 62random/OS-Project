@@ -1,10 +1,10 @@
-Isto vai dar sort
-$ ls
-Jk isto e que vai
-$| sort
-Isto faz mais merda
-$| head -1
-asda
-$1
-$2|
-$ wc
+isto vai listar
+$   ls
+isto da sort
+$|  sort
+cabeça
+$|  head -1
+wordcount ls
+$3| wc
+sdasdas
+$4| wc

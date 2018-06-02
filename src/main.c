@@ -16,43 +16,46 @@
 
 pid_t daddyold;
 pid_t daddy;
-char * buffer_safe_mode;
-int size;
-int ocupados;
-char const * filesource;
+char ** buffer_safe_mode;
+char const ** FILES;
+int * sizes;
+int * ocupados_a;
+int arg;
 
 /**
 	@brief			Função responsável por criar um backup do ficheiro inicial.
 	@param  source 	Path para o file
 */
 
-void backup_read(char const * source){
+void backup_read(char const * source,int o){
 
 	int fd = open(source, O_RDONLY , 00644);
+	int size;
 
 	if (fd == -1){
 		perror("Não conseguiu abrir a porta do ficheiro.");
 		_exit(-1);
 	}
 
-	buffer_safe_mode = malloc(100*sizeof(char));
+	buffer_safe_mode[o] = malloc(100*sizeof(char));
 	size = 100;
 
 	char c, * aux;
 	int i = 0,n;
 
 	while((n = read(fd,&c,1)) > 0){
-		buffer_safe_mode[i++] = c;
+		buffer_safe_mode[o][i++] = c;
 		if (i == size){
-			aux = buffer_safe_mode;
-			buffer_safe_mode = malloc(2*size*sizeof(char));
+			aux = buffer_safe_mode[o];
+			buffer_safe_mode[o] = malloc(2*size*sizeof(char));
 			for(n = 0; n < i ; n++)
-				buffer_safe_mode[n] = aux[n];
+				buffer_safe_mode[o][n] = aux[n];
 			free(aux);
 			size *= 2;
 		}
 	}
-	ocupados = i;
+	sizes[o]= size;
+	ocupados_a[o] = i;
 	close(fd);
 }
 
@@ -60,15 +63,15 @@ void backup_read(char const * source){
 	@brief			Função responsável escrever o backup no ficheiro.
 */
 
-void backup_write(){
-	int fd = open(filesource, O_WRONLY | O_TRUNC , 00644);
+void backup_write(int i){
+	int fd = open(FILES[i], O_WRONLY | O_TRUNC , 00644);
 
 	if (fd == -1){
 		perror("Não conseguiu abrir a porta do ficheiro.");
 		_exit(-1);
 	}
 
-	write(fd,buffer_safe_mode,ocupados);
+	write(fd,buffer_safe_mode[i],ocupados_a[i]);
 	close(fd);
 }
 
@@ -80,14 +83,15 @@ void backup_write(){
 void kill_all(int i){
 
 	pid_t self = getpid();
-    if (daddy != self && daddyold != self) _exit(-1);
+    if (daddyold != self) _exit(-1);
 	else{
 		printf("A sair de todos os processos\n" );
-		if (self == daddy){
-			backup_write();
-			_exit(-1);
+		int i;
+		for(i=0; i < arg; i++){
+			if (sizes[i] != -1)
+				backup_write(i);
 		}
-		else _exit(0);
+		_exit(0);
 	}
 
 
@@ -99,11 +103,6 @@ void kill_all(int i){
 }
 
 int executaSingleFile(char const * argv){
-
-	daddy= getpid();
-
-	filesource = argv;
-	backup_read(argv);
 
 	int fd = open(argv, O_RDONLY , 00644);
 
@@ -169,12 +168,6 @@ int executaSingleFile(char const * argv){
 	}
 
 	close(fd);
-	free(buffer_safe_mode);
-	for(d= 0; d < r; d++){
-		str_aux = output[d];
-		free(str_aux);
-	}
-	free(output);
 
 	_exit(0);
 }
@@ -203,17 +196,32 @@ int main(int argc, char const *argv[]) {
 
 	daddyold = getpid();
 
+
 	if (argc < 2) {
 		perror("Numero de argumentos inválido");
 		exit(-1);
 	}
 
+	sizes = malloc((argc-1)*sizeof(int));
+	ocupados_a = malloc((argc-1)*sizeof(int));
+	buffer_safe_mode = malloc((argc-1)*sizeof(char *));
+	FILES = malloc((argc-1)*sizeof(char *));
+
 	int i;
+	arg = argc-1;
+	for(i=1; i < argc; i++){
+		sizes[i-1] = -1;
+		FILES[i-1] = argv[i];
+	}
+
 	for(i=1; i < argc; i++){
 		if (checkFileName(argv,i)){
 			if(!fork()){
 				executaSingleFile(argv[i]);
 				_exit(0);
+			}
+			else{
+				backup_read(argv[i],i-1);
 			}
 		}
 	}

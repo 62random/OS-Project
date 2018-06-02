@@ -1,20 +1,20 @@
 isto vai listar
-$   l
+$   ls
 isto da sort
 $1|  sort
+cabeça
+$2|  head -1
 lista processos
 $   ps
 primeiro dos processos
 $1|  head -1
+wordcount do ant
+$1|  wc
+wordcount do ant
+$|  wc
 lista outra vez
 $   ls -a -l
 wordcount do ant
 $|  wc
->>>
-     11      92     520
-<<<
 wordcount do primeiro
-$3|  wc
->>>
-      8       8      71
-<<<
+$9|  wc

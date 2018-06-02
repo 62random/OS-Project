@@ -25,7 +25,7 @@ char ** split_string		(char * str);
 int 	wordcount			(char * str);
 void 	freeApChar			(char ** str);
 char * 	mystrcat			(char * str1, char * str2, int * size,int * i,int o);
-char * 	parseFileToString	(int coluna,int fd);
+char *  parseFileToString	(int coluna,char * file);
 
 
 #endif

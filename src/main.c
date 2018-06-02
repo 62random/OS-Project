@@ -23,10 +23,6 @@ char * buffer_safe_mode;
 int size;
 int k;
 char const * filesource;
-int * process_status;
-int * process_link;
-int * dependencias;
-int r;
 
 void removeFilesW();
 
@@ -87,10 +83,6 @@ void backup_write(){
 	close(fd);
 }
 
-/**
-	@brief			Função responsável matar todos os processos menos o pai.
-	@param  i 		Tipo de sinal.
-*/
 
 void kill_all(int i){
 
@@ -108,56 +100,10 @@ void kill_all(int i){
 
 }
 
-void wakeup(int i){
-	int status,pid,a,d;
-
-	pid = wait(&status);
-
-	if (pid != -1){
-		if (WIFEXITED(status)){
-			a = WEXITSTATUS(status);
-			if (a == 255){
-				removeFiles();
-				_exit(-1);
-			}
-		}
-		a=0;
-		while (process_link[a] != pid && a < r){
-			a++;
-		}
-		d = a;
-		process_status[d] = FINISHED;
-		for(a = 0; a < r; a++){
-			if(dependencias[a] == d){
-				kill(process_link[a],SIGCONT);
-				process_status[a] = RUNNING;
-			}
-		}
-	}
-}
-
-void removeFilesW(){
-	backup_write();
-	if(!fork()){
-		execlp("rm","rm","-r",LOCAL,NULL);
-	}
-}
-
-int verificaArray(){
-	int i = 0;
-	while(i < r && process_status[i] == 2){
-		i++;
-	}
-	return (i != r);
-}
-
 
 int main(int argc, char const *argv[]) {
 
 	signal(SIGINT,kill_all);
-	signal(SIGCHLD,wakeup);
-
-	int fork_pid_aux;
 
 	daddy = getpid();
 
@@ -172,91 +118,61 @@ int main(int argc, char const *argv[]) {
 	int fd = open(argv[1], O_RDONLY , 00644);
 
 	if (fd == -1){
-		printf("Porta inicial\n");
 		perror("Não conseguiu abrir a porta do ficheiro.");
 		_exit(-1);
 	}
 
 	LCMD aux = parser(fd);
-	int d,fd1,n,status;
+	int d,r,p[2],status;
 	LCMD * comandos = parser_split(aux,&r);
 	close(fd);
 	pid_t a;
-	int linha,coluna;
-
-	dependencias = malloc(sizeof(int) * r);
+	int linha,coluna,dependencias[r];
+	char ** output = malloc(r*sizeof(char *));
+	char * str_aux;
 
 	if(!calculaDependencias(comandos,dependencias,r)){
 		perror("Um dos comandos do tipo $n| não pode ser executado.");
 		_exit(-1);
 	}
-	mkdir(LOCAL,0777);
-
-	char * input;
-
-	process_status = malloc(sizeof(int) * r);
-	process_link = malloc(sizeof(int)*r);
 
 	for(d = 0; d < r; d++){
-		process_status[d] = NOSTARTED;
-		if(type(comandos[d]->comando) == 1){ // n-esimo
-			fork_pid_aux = fork();
-			if(fork_pid_aux != 0){
-				process_link[d] = fork_pid_aux;
-				process_status[d] = PAUSED;
-				kill(fork_pid_aux,SIGSTOP);
+		pipe(p);
+		if(!fork()){
+			close(p[0]);
+			if (type(comandos[d]->comando) == 1){
+				linha = posicaoArray(comandos,d,n_comando(comandos[d]->comando),&coluna);
+				str_aux = parseFileToString(coluna,output[linha]);
+				executa_n(comandos[d],p[1],str_aux);
 			}
-			else{
-				linha = posicaoArray(comandos, d, n_comando(comandos[d]->comando), &coluna);
-				//input = outputFromFile(linha, coluna);
-				//executa_n(comandos[d],d,input);
-				_exit(0);
-			}
+			else executa(comandos[d],p[1]);
+			close(p[1]);
 		}
-		else{ // normal
-			fork_pid_aux = fork();
-			if(!fork_pid_aux){
-				executa(comandos[d],d);
-				_exit(0);
+		else{
+			close(p[1]);
+			wait(&status);
+			if (WIFEXITED(status)){
+				a = WEXITSTATUS(status);
+				if (a == 255){
+					_exit(-1);
+				}
 			}
-			else{
-				process_link[d] = fork_pid_aux;
-				process_status[d] = RUNNING;
-			}
+			str_aux = lerPipe(p[0]);
+			output[d] = str_aux;
 		}
 	}
-	while(verificaArray());
 
 
 	fd = open(argv[1], O_WRONLY | O_TRUNC, 00644);
 	if (fd == -1){
-		printf("Foi no file inicial\n");
 		perror("Não conseguiu abrir a porta do ficheiro.");
-		removeFiles();
 		_exit(-1);
 	}
-	char c;
-	char str [100];
 
 	for(d = 0; d < r; d++){
-		sprintf(str,"%s/aux_%d",LOCAL,d);
-
-		fd1 = open(str,O_RDONLY,0644);
-
-		if (fd1 == -1){
-			printf("Foi no file%d\n",d);
-			perror("Não conseguiu abrir a porta do ficheiro.");
-			removeFilesW();
-			_exit(-1);
-		}
-
-		while ((n = read(fd1,&c,1)) > 0){
-			write(fd,&c,n);
-		}
-		close(fd1);
+		write(fd,output[d],strlen(output[d]));
 	}
-
-	removeFiles();
+	close(fd);
 
 	return 1;
 }

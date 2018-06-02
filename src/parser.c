@@ -290,6 +290,16 @@ void freeApChar(char ** str){
 	}
 }
 
+/**
+	@brief			Função que concatena duas string.
+	@param  str1 	Destino.
+	@param  str2	String a copiar.
+	@param  size	Tamanho max da string de Destino.
+	@param	i		Tamanho da string de Destino.
+	@param	o 		Boolean se no fim leva '\n'
+	@return 		String concatenada.
+*/
+
 char * mystrcat(char * str1, char * str2, int * size,int * i,int o){
 	int size1 = *size;
 	int i1 = * i, flag = 0;
@@ -319,17 +329,27 @@ char * mystrcat(char * str1, char * str2, int * size,int * i,int o){
 	return str1;
 }
 
-char * parseFileToString(int coluna,int fd){
+/**
+	@brief			Função que retira de uma string um parte.
+	@param  coluna	Coluna para identificar a secção a escolher.
+	@param  file	Ficheiro em string.
+	@return 		String limitada.
+*/
+
+char * parseFileToString(int coluna,char * file){
 	MSTRING matrix = initMS(10);
-	char str[4096];
-	char * str2= NULL;
+	char * str2= NULL, * token;
+	char s[2] = "\n";
 
 	int n;
-	while((n=readln(fd,str,200)) > 0){
-		str2 = malloc((n)*sizeof(char));
-		strcpy(str2,str);
-		addMatrix(str2,matrix);
+
+	token = strtok(file, s);
+
+	while(token != NULL){
+		addMatrix(token,matrix);
+		token = strtok(NULL, s);
 	}
+
 	int counter = -1; n = 0;
 	while(coluna != counter){
 		if(strcmp(matrix->matrix[n],">>>") == 0){
@@ -344,7 +364,8 @@ char * parseFileToString(int coluna,int fd){
 		str2 = mystrcat(str2,matrix->matrix[n],&size,&i,1);
 		n++;
 	}
-	freeMString(matrix);
+	free(matrix->matrix);
+	free(matrix);
 
 	return str2;
 }

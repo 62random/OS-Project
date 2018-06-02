@@ -22,7 +22,7 @@ void escreveFicheiroAux(int fp, char * str , LCMD comando){
 
 /**
 	@brief					Função responsável por adicionar o resultado de vários comandos ligados a um pipe.
-	@param  d_pai 			Número da execução.
+	@param  d_pai 			Porta para o ficheiro.
 	@param  d_max_filho		Número de comandos interligados.
 	@param	comando 		Struct com a informação sobre o comando executado e a sua descrição.
 	@param 	buffer			Apontador de strings com os vários resultados dos comandos.
@@ -30,24 +30,19 @@ void escreveFicheiroAux(int fp, char * str , LCMD comando){
 
 void juntaFildes(int d_pai,int d_max_filho,LCMD comando,char ** buffer){
 	int i;
-	char str [100];
-	sprintf(str,"%s/aux_%d",LOCAL,d_pai);
-
-	int fd = open(str,O_CREAT | O_WRONLY,0644);
-
-	if (fd == -1){
-		printf("%s\n",str);
-		perror("Não conseguiu abrir a porta do ficheiro.");
-		_exit(-1);
-	}
-
+	char * str;
 	for(i = 0; i < d_max_filho; i++, comando = comando->prox){
-		escreveFicheiroAux(fd,buffer[i],comando);
+		escreveFicheiroAux(d_pai,buffer[i],comando);
 	}
+	for(i = 0; i < d_max_filho; i++){
+		str = buffer[i];
+		free(str);
+	}
+	free(buffer);
 }
 
 /**
-	@brief				Função responsável por executar um conjunto de comandos interligados.
+	@brief				Função responsável por executar um conjunto de comandos interligados sem input no stdin.
 	@param  comando 	Lista de comandos a executar.
 	@param	fd_origin 	Número da execução.
 */
@@ -123,6 +118,13 @@ int executa(LCMD comando,int fd_origin){
 
 	_exit(0);
 }
+
+/**
+	@brief				Função responsável por executar um conjunto de comandos interligados com input no stdin.
+	@param  comando 	Lista de comandos a executar.
+	@param	fd_origin 	Número da execução.
+	@param	input		Input para o stdin.
+*/
 
 int executa_n(LCMD comando,int fd_origin,char * input){
 	int p[2],n,c = 0, status,size = 1024,i = 0, k = 0,p1[2];
@@ -287,6 +289,15 @@ int n_comando(char * source){
 	return r;
 }
 
+
+/**
+	@brief				Função responsável por calcular as dependencias entre comandos.
+	@param 	comandos	Array com os comandos.
+	@param  v			Array a preencher com as dependências.
+	@param	r 			Número de elementos.
+	@return				Boolean se existem dependências impossíveis.
+*/
+
 int calculaDependencias(LCMD * comandos, int * v,int r){
 	LCMD aux;
 	int status = 1;
@@ -308,28 +319,32 @@ int calculaDependencias(LCMD * comandos, int * v,int r){
 	return status;
 }
 
-char * outputFromFile(int dependencia,int coluna){
-	char path[100];
-	char * result = NULL;
-	sprintf(path,"%s/aux_%d",LOCAL,dependencia);
+/**
+	@brief				Função responsável por ler um pipe para memória.
+	@param 	fd			Porta para o ficheiro.
+	@return				String com a informação.
+*/
 
-	int fd = open(path,O_RDONLY,0644);
-	if (fd == -1){
-		perror("Não conseguiu abrir a porta do ficheiro.");
-		_exit(-1);
+char * lerPipe(int fd){
+	char x;
+	int i = 0,size = 100,k;
+	char * str_aux, * buffer = malloc(size*sizeof(char));
+
+	while (read(fd,&x,1) > 0){
+		buffer[i] = x;
+		i++;
+		if (i == size){
+			str_aux = buffer;
+			buffer = malloc(size*2*sizeof(char));
+			for(k = 0; k < size; k++){
+				buffer[k] = str_aux[k];
+			}
+			free(str_aux);
+			size *= 2;
+		}
 	}
-	result = parseFileToString(coluna,fd);
-	close(fd);
 
-	return result;
-}
+	buffer[i] = '\0';
 
-int ja_acabou(int dep, int col){
-
-	char path[100];
-	sprintf(path,"%s/aux_%d",LOCAL,dep);
-	char buffer[100];
-
-	return 1;
-
+	return buffer;
 }

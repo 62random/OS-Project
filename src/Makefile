@@ -15,8 +15,8 @@ print-% : ; @echo $* = $($*)
 $(ODIR)/%.o : %.c $(DEPS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-program: $(SOURCES_OBJ)
-	$(CC) $(CFLAGS) $(wildcard $(ODIR)/*.o) -o program
+notebook: $(SOURCES_OBJ)
+	$(CC) $(CFLAGS) $(wildcard $(ODIR)/*.o) -o notebook
 
 
 
@@ -24,4 +24,4 @@ program: $(SOURCES_OBJ)
 
 clean:
 	rm obj/*.o
-	rm program
+	rm notebook

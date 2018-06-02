@@ -137,6 +137,7 @@ int executaSingleFile(char const * argv){
 			}
 			else executa(comandos[d],p[1]);
 			close(p[1]);
+			_exit(0);
 		}
 		else{
 			close(p[1]);

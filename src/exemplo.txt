@@ -1,75 +1,20 @@
 isto vai listar
-$ ls
->>>
-exemplo.txt
-main.c
-Makefile
-note
-notebook
-obj
-parser.c
-process.c
-program
-<<<
+$   l
 isto da sort
 $1|  sort
->>>
-exemplo.txt
-main.c
-Makefile
-note
-notebook
-obj
-parser.c
-process.c
-program
-<<<
 lista processos
-$ ps
->>>
-  PID TTY          TIME CMD
- 2791 pts/12   00:00:00 bash
-20346 pts/12   00:00:01 program
-20348 pts/12   00:00:00 program <defunct>
-21055 pts/12   00:01:45 program
-21057 pts/12   00:00:00 program <defunct>
-22264 pts/12   00:00:01 program
-22266 pts/12   00:00:00 program
-22270 pts/12   00:00:00 wc
-28742 pts/12   00:00:00 gdb
-29025 pts/12   00:00:00 gdb
-29247 pts/12   00:00:00 notebook
-29252 pts/12   00:00:00 notebook
-29253 pts/12   00:00:00 ps
-<<<
+$   ps
 primeiro dos processos
 $1|  head -1
->>>
-x‹VOÐ  PID TTY          TIME CMD
-<<<
 lista outra vez
-$ ls -a -l
->>>
-total 232
-drwxrwxr-x 3 alexrone alexrone  4096 Jun  2 21:46 .
-drwxrwxr-x 5 alexrone alexrone  4096 Mai 30 11:31 ..
--rwxrwxr-x 1 alexrone alexrone  1549 Jun  2 21:46 exemplo.txt
--rwxrwxr-x 1 alexrone alexrone  2965 Jun  2 21:33 main.c
--rwxrwxr-x 1 alexrone alexrone   407 Jun  2 21:33 Makefile
--rwxrwxr-x 1 alexrone alexrone   194 Mai 30 11:31 note
--rwxrwxr-x 1 alexrone alexrone 56960 Jun  2 21:46 notebook
-drwxrwxr-x 2 alexrone alexrone  4096 Jun  2 21:46 obj
--rwxrwxr-x 1 alexrone alexrone  7178 Jun  2 21:33 parser.c
--rw-rw-r-- 1 alexrone alexrone  7546 Jun  2 21:45 process.c
--rwxrwxr-x 1 alexrone alexrone 67904 Jun  2 19:04 program
-<<<
+$   ls -a -l
 wordcount do ant
 $|  wc
 >>>
-     12     101     639
+     11      92     520
 <<<
 wordcount do primeiro
 $3|  wc
 >>>
-      1       5      40
+      8       8      71
 <<<

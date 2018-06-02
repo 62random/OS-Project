@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <stdio.h>
+#include <ctype.h>
 
 
 void 	escreveFicheiroAux		(int fp, char * str , LCMD comando);

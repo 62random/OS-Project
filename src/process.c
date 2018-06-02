@@ -95,7 +95,7 @@ int executa(LCMD comando,int fd_origin){
 			}
 			pipe(p);
 
-			buffer[i] = '\0';
+			buffer[i++] = '\0';
 			write(p[1],buffer,i);
 
 			str_aux = malloc((i+1)*sizeof(char));
@@ -187,7 +187,7 @@ int executa_n(LCMD comando,int fd_origin,char * input){
 			close(p[0]);
 			pipe(p);
 
-			buffer[i] = '\0';
+			buffer[i++] = '\0';
 			write(p[1],buffer,i);
 
 			str_aux = malloc(i*sizeof(char));
